@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TruthFinder Growth War Room</title>
+  <title>TruthFinder Competitive Growth War Room</title>
   <style>
     :root{
       --bg:#0b0d10;
@@ -31,13 +31,11 @@
     }
 
     .container {
-      max-width: 1500px;
+      max-width: 1550px;
       margin: 0 auto;
     }
 
-    h1, h2, h3 {
-      margin-top: 0;
-    }
+    h1, h2, h3 { margin-top: 0; }
 
     .sub {
       color: var(--muted);
@@ -117,6 +115,16 @@
       color: var(--red);
       margin-top: 12px;
       white-space: pre-wrap;
+    }
+
+    .warning {
+      background: #2a1f10;
+      color: var(--warn);
+      border: 1px solid #6a5420;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 14px;
     }
 
     .hidden { display: none; }
@@ -222,17 +230,14 @@
       font-size: 13px;
     }
 
-    .sourceCard,
-    .testCard,
-    .channelCard {
+    .box {
       background: var(--panel2);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px;
     }
 
-    .testTitle,
-    .channelTitle {
+    .boxTitle {
       color: var(--goldSoft);
       font-weight: 700;
       margin-bottom: 8px;
@@ -276,24 +281,14 @@
       font-size: 13px;
       color: #d6dde6;
     }
-
-    .warning {
-      background: #2a1f10;
-      color: var(--warn);
-      border: 1px solid #6a5420;
-      border-radius: 10px;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 14px;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>TruthFinder Growth War Room</h1>
+    <h1>TruthFinder Competitive Growth War Room</h1>
     <div class="sub">
-      Action-oriented competitor analysis for TruthFinder across people search, identity, safety, privacy,
-      and data-protection positioning. Designed to show what to test next, why it matters, and what the upside could be.
+      Analyze direct competitors, privacy-adjacent competitors, auction overlap, search term alignment,
+      and where TruthFinder can steal traffic with sharper PPC strategy.
     </div>
 
     <div class="card">
@@ -302,6 +297,7 @@
           <label for="urlInput">Competitor URL or domain</label>
           <input id="urlInput" type="text" placeholder="e.g. beenverified.com or cloaked.com" />
         </div>
+
         <div class="narrow">
           <label for="marketSelect">Market</label>
           <select id="marketSelect">
@@ -311,6 +307,7 @@
             <option value="privacy">Privacy / Data Protection</option>
           </select>
         </div>
+
         <div class="narrow">
           <label for="deviceSelect">Device</label>
           <select id="deviceSelect">
@@ -322,12 +319,20 @@
 
       <div class="row" style="margin-top:12px;">
         <div class="grow">
+          <label for="searchTermsInput">Your Search Terms (one per line)</label>
+          <textarea id="searchTermsInput" placeholder="reverse phone lookup
+who called me
+people search
+background check before dating"></textarea>
+        </div>
+
+        <div class="grow">
           <label for="questionInput">What do you want solved?</label>
           <textarea id="questionInput" placeholder="Examples:
-- Where can TruthFinder get incremental paid volume?
-- Which white-space angles are competitors not owning?
-- What privacy-adjacent angles could we test?
-- What specific campaigns should we launch next?"></textarea>
+- Is this brand a real competitor to TruthFinder?
+- What search terms overlap with ours?
+- Where can we steal their traffic?
+- What privacy-adjacent angles should we test?"></textarea>
         </div>
       </div>
 
@@ -368,9 +373,26 @@
         </div>
 
         <div class="card">
-          <h2>Data Source Coverage</h2>
-          <div id="sourceStatus" class="autoGrid"></div>
+          <h2>Competitive Relationship to TruthFinder</h2>
+          <div id="competition"></div>
         </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h2>Auction Overlap Estimator</h2>
+          <div id="auctionOverlap"></div>
+        </div>
+
+        <div class="card">
+          <h2>Search Terms Alignment</h2>
+          <div id="searchTermAlignment"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Steal Their Traffic Engine</h2>
+        <div id="stealTraffic"></div>
       </div>
 
       <div class="card">
@@ -380,19 +402,14 @@
 
       <div class="grid2">
         <div class="card">
-          <h2>Scoring Methodology</h2>
-          <div id="methodology"></div>
+          <h2>Quantified Opportunity</h2>
+          <div id="opportunityModel"></div>
         </div>
 
         <div class="card">
           <h2>Pressure Summary</h2>
           <div id="pressureSummary"></div>
         </div>
-      </div>
-
-      <div class="card">
-        <h2>Quantified Opportunity</h2>
-        <div id="opportunityModel"></div>
       </div>
 
       <div class="card">
@@ -434,48 +451,16 @@
         <div id="channelRecommendations" class="autoGrid"></div>
       </div>
 
-      <div class="grid3">
-        <div class="card">
-          <h2>Detected Hooks</h2>
-          <div id="hooks"></div>
-        </div>
-
-        <div class="card">
-          <h2>Funnel Steps</h2>
-          <ul id="funnel"></ul>
-        </div>
-
-        <div class="card">
-          <h2>Action Plan</h2>
-          <ul id="actions"></ul>
-        </div>
-      </div>
-
       <div class="grid2">
         <div class="card">
-          <h2>Key Observations</h2>
-          <ul id="observations"></ul>
+          <h2>SERP Findings</h2>
+          <div id="serps"></div>
         </div>
 
         <div class="card">
-          <h2>Evidence Extracts</h2>
-          <div id="evidence" class="mono"></div>
+          <h2>Raw Crawl Notes</h2>
+          <div id="notes" class="mono"></div>
         </div>
-      </div>
-
-      <div class="card">
-        <h2>Creative Summary</h2>
-        <div id="creativeSummary" class="small"></div>
-      </div>
-
-      <div class="card">
-        <h2>SERP Findings</h2>
-        <div id="serps"></div>
-      </div>
-
-      <div class="card">
-        <h2>Raw Crawl Notes</h2>
-        <div id="notes" class="mono"></div>
       </div>
     </div>
   </div>
@@ -484,6 +469,7 @@
     const urlInput = document.getElementById("urlInput");
     const marketSelect = document.getElementById("marketSelect");
     const deviceSelect = document.getElementById("deviceSelect");
+    const searchTermsInput = document.getElementById("searchTermsInput");
     const questionInput = document.getElementById("questionInput");
     const benchmarkCtr = document.getElementById("benchmarkCtr");
     const benchmarkCvr = document.getElementById("benchmarkCvr");
@@ -507,13 +493,6 @@
         .replaceAll("'", "&#039;");
     }
 
-    function badgeClass(status) {
-      const s = String(status || "").toLowerCase();
-      if (s.includes("connected")) return "green";
-      if (s.includes("not")) return "red";
-      return "gold";
-    }
-
     function levelClass(level) {
       const s = String(level || "").toLowerCase();
       if (s.includes("high")) return "red";
@@ -524,15 +503,8 @@
     async function safeJsonFetch(url, options) {
       const response = await fetch(url, options);
       const text = await response.text();
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${text}`);
-      }
-
-      if (!text.trim()) {
-        throw new Error("Server returned an empty response.");
-      }
-
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${text}`);
+      if (!text.trim()) throw new Error("Server returned an empty response.");
       return JSON.parse(text);
     }
 
@@ -543,45 +515,118 @@
         ["Input URL", data.input_url],
         ["Market", data.market],
         ["Device", data.device],
-        ["Page Title", data.page_title],
-        ["Headline", data.headline],
-        ["Pressure Band", data.pressure_band],
         ["Summary", data.summary]
       ];
-
       document.getElementById("overview").innerHTML = rows.map(([k, v]) => `
         <div>${escapeHtml(k)}</div>
         <div>${escapeHtml(v)}</div>
       `).join("");
     }
 
-    function renderSourceStatus(data) {
-      const items = data.data_sources || [];
-      document.getElementById("sourceStatus").innerHTML = items.length
-        ? items.map(x => `
-          <div class="sourceCard">
-            <div><strong>${escapeHtml(x.name)}</strong> <span class="pill ${badgeClass(x.status)}">${escapeHtml(x.status)}</span></div>
-            <div class="small" style="margin-top:8px;">${escapeHtml(x.detail)}</div>
+    function renderCompetition(data) {
+      const c = data.competition_classification || {};
+      document.getElementById("competition").innerHTML = `
+        <div class="metric">
+          <div class="label">Competitor Type</div>
+          <div class="value">${escapeHtml(c.competitor_type || "")}</div>
+          <div class="detail">Overlap Score: ${escapeHtml(c.overlap_score ?? "")}</div>
+        </div>
+        <div class="small" style="margin-top:12px;">
+          <strong>Keyword Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.keyword_overlap ?? "")}<br>
+          <strong>Problem Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.problem_overlap ?? "")}<br>
+          <strong>Audience Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.audience_overlap ?? "")}
+        </div>
+        <div class="small" style="margin-top:12px;"><strong>Why They Compete:</strong><br>${escapeHtml(c.why_they_compete || "")}</div>
+        <div class="small" style="margin-top:12px;"><strong>How They Take Budget:</strong><br>${escapeHtml(c.how_they_steal_budget || "")}</div>
+        <div class="small" style="margin-top:12px;"><strong>Recommended Response:</strong><br>${escapeHtml(c.recommended_response || "")}</div>
+      `;
+    }
+
+    function renderAuctionOverlap(data) {
+      const a = data.auction_overlap_estimator || {};
+      const rows = a.top_overlap_keywords || [];
+      document.getElementById("auctionOverlap").innerHTML = `
+        <div class="small"><strong>Estimated Auction Overlap Score:</strong> ${escapeHtml(a.auction_overlap_score ?? "")}</div>
+        <div class="small" style="margin-top:8px;"><strong>Interpretation:</strong> ${escapeHtml(a.interpretation || "")}</div>
+        ${rows.length ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Keyword</th>
+                <th>Estimated Volume Tier</th>
+                <th>Why It Matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.keyword)}</td>
+                  <td>${escapeHtml(r.volume_tier)}</td>
+                  <td>${escapeHtml(r.reason)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : `<div class="small" style="margin-top:10px;">No overlap keywords returned.</div>`}
+      `;
+    }
+
+    function renderSearchTermAlignment(data) {
+      const s = data.search_term_alignment || {};
+      const rows = s.matches || [];
+      document.getElementById("searchTermAlignment").innerHTML = `
+        <div class="small"><strong>Alignment Score:</strong> ${escapeHtml(s.alignment_score ?? "")}</div>
+        <div class="small" style="margin-top:8px;"><strong>Interpretation:</strong> ${escapeHtml(s.interpretation || "")}</div>
+        ${rows.length ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Your Search Term</th>
+                <th>Matched Cluster</th>
+                <th>Competition Signal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.search_term)}</td>
+                  <td>${escapeHtml(r.matched_cluster)}</td>
+                  <td>${escapeHtml(r.competition_signal)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : `<div class="small" style="margin-top:10px;">No search term matches returned.</div>`}
+      `;
+    }
+
+    function renderStealTraffic(data) {
+      const rows = data.steal_their_traffic_engine || [];
+      document.getElementById("stealTraffic").innerHTML = rows.length
+        ? rows.map(r => `
+          <div class="box" style="margin-bottom:12px;">
+            <div class="boxTitle">${escapeHtml(r.play_name)}</div>
+            <div class="small"><strong>Target:</strong> ${escapeHtml(r.target_cluster)}</div>
+            <div class="small" style="margin-top:6px;"><strong>What to launch:</strong> ${escapeHtml(r.what_to_launch)}</div>
+            <div class="small" style="margin-top:6px;"><strong>Why this can work:</strong> ${escapeHtml(r.why_this_can_work)}</div>
+            <div class="small" style="margin-top:6px;"><strong>Expected outcome:</strong> ${escapeHtml(r.expected_outcome)}</div>
           </div>
         `).join("")
-        : `<div class="small">No data sources returned.</div>`;
+        : `<div class="small">No steal-their-traffic plays returned.</div>`;
     }
 
     function renderScores(data) {
       const map = [
         ["keyword_opportunity_score", "Keyword Opportunity"],
         ["paid_intent_coverage_score", "Paid Intent Coverage"],
-        ["creative_angle_diversity_score", "Creative Angle Diversity"],
+        ["creative_angle_diversity_score", "Creative Diversity"],
         ["use_case_expansion_score", "Use Case Expansion"],
         ["privacy_adjacent_score", "Privacy Adjacent"],
         ["testability_score", "Testability"],
-        ["offer_cta_strength_score", "Offer / CTA Strength"],
-        ["funnel_monetization_efficiency_score", "Funnel Efficiency"],
         ["keyword_pressure_score", "Composite Pressure"]
       ];
 
       const explanations = data.score_explanations || {};
-
       document.getElementById("scores").innerHTML = map.map(([key, label]) => `
         <div class="metric">
           <div class="label">${escapeHtml(label)}</div>
@@ -591,30 +636,9 @@
       `).join("");
     }
 
-    function renderMethodology(data) {
-      const method = data.scoring_methodology || {};
-      document.getElementById("methodology").innerHTML = Object.keys(method).length
-        ? Object.entries(method).map(([k, v]) => `
-          <div style="margin-bottom:14px;">
-            <div><strong>${escapeHtml(k)}</strong></div>
-            <div class="small" style="margin-top:4px;">${escapeHtml(v)}</div>
-          </div>
-        `).join("")
-        : `<div class="small">No methodology returned.</div>`;
-    }
-
-    function renderPressureSummary(data) {
-      const drivers = data.pressure_drivers || [];
-      document.getElementById("pressureSummary").innerHTML = `
-        <div class="small" style="margin-bottom:10px;">${escapeHtml(data.pressure_summary || "")}</div>
-        <div>${drivers.map(d => `<span class="pill blue">${escapeHtml(d)}</span>`).join("")}</div>
-      `;
-    }
-
     function renderOpportunityModel(data) {
       const model = data.opportunity_model || {};
       const scenarios = model.scenarios || [];
-
       document.getElementById("opportunityModel").innerHTML = scenarios.length ? `
         <div class="small" style="margin-bottom:10px;">
           Estimated incremental sales: <strong>${escapeHtml(model.total_estimated_incremental_sales)}</strong>
@@ -651,20 +675,28 @@
             `).join("")}
           </tbody>
         </table>
-      ` : `<div class="small">No quantified opportunity returned.</div>`;
+      ` : `<div class="small">No opportunity returned.</div>`;
+    }
+
+    function renderPressureSummary(data) {
+      const drivers = data.pressure_drivers || [];
+      document.getElementById("pressureSummary").innerHTML = `
+        <div class="small">${escapeHtml(data.pressure_summary || "")}</div>
+        <div style="margin-top:10px;">${drivers.map(d => `<span class="pill blue">${escapeHtml(d)}</span>`).join("")}</div>
+      `;
     }
 
     function renderPriorityTests(data) {
-      const tests = data.priority_tests || [];
-      document.getElementById("priorityTests").innerHTML = tests.length
-        ? tests.map(t => `
-          <div class="testCard" style="margin-bottom:12px;">
-            <div class="testTitle">${escapeHtml(t.test_name)}</div>
-            <div class="small"><strong>Channel:</strong> ${escapeHtml(t.channel)}</div>
-            <div class="small" style="margin-top:6px;"><strong>What to test:</strong> ${escapeHtml(t.what_to_test)}</div>
-            <div class="small" style="margin-top:6px;"><strong>Hypothesis:</strong> ${escapeHtml(t.hypothesis)}</div>
-            <div class="small" style="margin-top:6px;"><strong>Expected outcome:</strong> ${escapeHtml(t.expected_outcome)}</div>
-            <div class="small" style="margin-top:6px;"><strong>Why spend here:</strong> ${escapeHtml(t.why_fund)}</div>
+      const rows = data.priority_tests || [];
+      document.getElementById("priorityTests").innerHTML = rows.length
+        ? rows.map(r => `
+          <div class="box" style="margin-bottom:12px;">
+            <div class="boxTitle">${escapeHtml(r.test_name)}</div>
+            <div class="small"><strong>Channel:</strong> ${escapeHtml(r.channel)}</div>
+            <div class="small" style="margin-top:6px;"><strong>What to test:</strong> ${escapeHtml(r.what_to_test)}</div>
+            <div class="small" style="margin-top:6px;"><strong>Hypothesis:</strong> ${escapeHtml(r.hypothesis)}</div>
+            <div class="small" style="margin-top:6px;"><strong>Expected outcome:</strong> ${escapeHtml(r.expected_outcome)}</div>
+            <div class="small" style="margin-top:6px;"><strong>Why fund:</strong> ${escapeHtml(r.why_fund)}</div>
           </div>
         `).join("")
         : `<div class="small">No priority tests returned.</div>`;
@@ -682,8 +714,6 @@
               <th>Visibility</th>
               <th>Opportunity</th>
               <th>Keywords</th>
-              <th>Channels</th>
-              <th>Why It Matters</th>
             </tr>
           </thead>
           <tbody>
@@ -695,8 +725,6 @@
                 <td>${escapeHtml(r.competitor_visibility_score)}</td>
                 <td><span class="pill ${levelClass(r.opportunity_level)}">${escapeHtml(r.opportunity_level)}</span></td>
                 <td>${escapeHtml((r.representative_keywords || []).join(", "))}</td>
-                <td>${escapeHtml((r.recommended_channels || []).join(", "))}</td>
-                <td>${escapeHtml(r.why_it_matters)}</td>
               </tr>
             `).join("")}
           </tbody>
@@ -734,12 +762,11 @@
       const rows = data.whitespace_use_cases || [];
       document.getElementById("whitespaceUseCases").innerHTML = rows.length
         ? rows.map(r => `
-          <div class="testCard" style="margin-bottom:12px;">
-            <div class="testTitle">${escapeHtml(r.use_case)}</div>
+          <div class="box" style="margin-bottom:12px;">
+            <div class="boxTitle">${escapeHtml(r.use_case)}</div>
             <div class="small"><strong>Suggested angle:</strong> ${escapeHtml(r.suggested_angle)}</div>
             <div class="small" style="margin-top:6px;"><strong>Why this is white space:</strong> ${escapeHtml(r.why_it_is_white_space)}</div>
             <div class="small" style="margin-top:6px;"><strong>Why fund:</strong> ${escapeHtml(r.why_fund)}</div>
-            <div class="small" style="margin-top:6px;"><strong>Channels:</strong> ${escapeHtml((r.channels || []).join(", "))}</div>
           </div>
         `).join("")
         : `<div class="small">No white-space use cases returned.</div>`;
@@ -753,7 +780,6 @@
             <div class="label">${escapeHtml(r.angle)}</div>
             <div class="detail"><strong>User problem:</strong> ${escapeHtml(r.user_problem)}</div>
             <div class="detail" style="margin-top:8px;"><strong>Reason:</strong> ${escapeHtml(r.reason)}</div>
-            <div class="detail" style="margin-top:8px;"><strong>Channels:</strong> ${escapeHtml((r.best_channels || []).join(", "))}</div>
             <div style="margin-top:10px;">
               ${(r.hook_templates || []).map(h => `<span class="pill gold">${escapeHtml(h)}</span>`).join("")}
             </div>
@@ -766,43 +792,27 @@
       const rows = data.test_hypotheses || [];
       document.getElementById("testHypotheses").innerHTML = rows.length
         ? rows.map(r => `
-          <div class="testCard" style="margin-bottom:12px;">
-            <div class="testTitle">${escapeHtml(r.title)}</div>
+          <div class="box" style="margin-bottom:12px;">
+            <div class="boxTitle">${escapeHtml(r.title)}</div>
             <div class="small"><strong>Hypothesis:</strong> ${escapeHtml(r.hypothesis)}</div>
             <div class="small" style="margin-top:6px;"><strong>Why spend here:</strong> ${escapeHtml(r.why_spend_here)}</div>
             <div class="small" style="margin-top:6px;"><strong>Primary KPI:</strong> ${escapeHtml(r.primary_kpi)}</div>
           </div>
         `).join("")
-        : `<div class="small">No test hypotheses returned.</div>`;
+        : `<div class="small">No hypotheses returned.</div>`;
     }
 
     function renderChannelRecommendations(data) {
       const channels = data.channel_recommendations || {};
       const entries = Object.entries(channels);
-
       document.getElementById("channelRecommendations").innerHTML = entries.length
         ? entries.map(([channel, recs]) => `
-          <div class="channelCard">
-            <div class="channelTitle">${escapeHtml(channel.replaceAll("_", " "))}</div>
-            <ul>
-              ${(recs || []).map(r => `<li>${escapeHtml(r)}</li>`).join("")}
-            </ul>
+          <div class="box">
+            <div class="boxTitle">${escapeHtml(channel.replaceAll("_", " "))}</div>
+            <ul>${(recs || []).map(r => `<li>${escapeHtml(r)}</li>`).join("")}</ul>
           </div>
         `).join("")
         : `<div class="small">No channel recommendations returned.</div>`;
-    }
-
-    function renderHooks(data) {
-      const hooks = data.detected_hooks || [];
-      document.getElementById("hooks").innerHTML = hooks.length
-        ? hooks.map(h => `<span class="pill gold">${escapeHtml(h)}</span>`).join("")
-        : `<div class="small">No hooks detected.</div>`;
-    }
-
-    function renderList(id, items, emptyText) {
-      document.getElementById(id).innerHTML = (items || []).length
-        ? items.map(x => `<li>${escapeHtml(x)}</li>`).join("")
-        : `<li class="small">${escapeHtml(emptyText)}</li>`;
     }
 
     function renderSerps(data) {
@@ -830,15 +840,15 @@
             `).join("")}
           </tbody>
         </table>
-      ` : `<div class="small">No SERP findings returned.</div>`;
+      ` : `<div class="small">No SERP data returned.</div>`;
     }
 
     function renderWarnings(data) {
       const warnings = [];
-      if (!data.keyword_clusters?.length) warnings.push("No keyword clusters returned.");
-      if (!data.priority_tests?.length) warnings.push("No priority tests returned.");
-      if (!data.opportunity_model?.scenarios?.length) warnings.push("No opportunity scenarios returned.");
-      if (!data.test_hypotheses?.length) warnings.push("No test hypotheses returned.");
+      if (!data.competition_classification) warnings.push("No competition classification returned.");
+      if (!data.auction_overlap_estimator) warnings.push("No auction overlap estimator returned.");
+      if (!data.search_term_alignment) warnings.push("No search term alignment returned.");
+      if (!data.steal_their_traffic_engine?.length) warnings.push("No traffic-stealing plays returned.");
 
       if (warnings.length) {
         warningEl.classList.remove("hidden");
@@ -852,11 +862,13 @@
     function renderResult(data) {
       resultsEl.classList.remove("hidden");
       renderOverview(data);
-      renderSourceStatus(data);
+      renderCompetition(data);
+      renderAuctionOverlap(data);
+      renderSearchTermAlignment(data);
+      renderStealTraffic(data);
       renderScores(data);
-      renderMethodology(data);
-      renderPressureSummary(data);
       renderOpportunityModel(data);
+      renderPressureSummary(data);
       renderPriorityTests(data);
       renderKeywordClusters(data);
       renderUnderutilizedKeywords(data);
@@ -864,12 +876,6 @@
       renderCreativeAngles(data);
       renderTestHypotheses(data);
       renderChannelRecommendations(data);
-      renderHooks(data);
-      renderList("funnel", data.detected_funnel_steps || [], "No funnel steps returned.");
-      renderList("actions", data.action_plan || [], "No actions returned.");
-      renderList("observations", data.key_observations || [], "No observations returned.");
-      document.getElementById("evidence").textContent = (data.evidence_extracts || []).join("\n\n---\n\n");
-      document.getElementById("creativeSummary").textContent = data.creative_summary || "";
       renderSerps(data);
       document.getElementById("notes").textContent = (data.crawl_notes || []).join("\n");
       renderWarnings(data);
@@ -879,8 +885,8 @@
       const url = urlInput.value.trim();
       errorEl.textContent = "";
       statusEl.textContent = "";
-      resultsEl.classList.add("hidden");
       warningEl.classList.add("hidden");
+      resultsEl.classList.add("hidden");
       exportBtn.disabled = true;
       latestResult = null;
 
@@ -898,6 +904,10 @@
           market: marketSelect.value,
           device: deviceSelect.value,
           questions: questionInput.value.trim(),
+          search_terms: searchTermsInput.value
+            .split("\n")
+            .map(x => x.trim())
+            .filter(Boolean),
           benchmark_ctr_pct: Number(benchmarkCtr.value || 4),
           benchmark_cvr_pct: Number(benchmarkCvr.value || 3),
           benchmark_cpc: Number(benchmarkCpc.value || 2.5),
@@ -927,10 +937,10 @@
 
       const rows = [
         ...(latestResult.action_plan || []).map(v => ({ category: "action_plan", value: v })),
-        ...(latestResult.key_observations || []).map(v => ({ category: "key_observation", value: v })),
         ...(latestResult.priority_tests || []).map(v => ({ category: "priority_test", value: `${v.test_name} | ${v.channel}` })),
         ...(((latestResult.opportunity_model || {}).scenarios || []).map(v => ({ category: "opportunity_scenario", value: `${v.scenario} | ${v.target} | sales=${v.estimated_sales}` }))),
-        ...(latestResult.underutilized_keywords || []).map(v => ({ category: "underutilized_keyword", value: `${v.keyword} | ${v.cluster}` }))
+        ...((latestResult.steal_their_traffic_engine || []).map(v => ({ category: "steal_traffic_play", value: `${v.play_name} | ${v.target_cluster}` }))),
+        ...(((latestResult.search_term_alignment || {}).matches || []).map(v => ({ category: "search_term_match", value: `${v.search_term} | ${v.matched_cluster}` })))
       ];
 
       try {
