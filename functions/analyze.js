@@ -16,6 +16,33 @@ const COMMON_QUERY_SETS = [
   "privacy protection"
 ];
 
+const TRUTHFINDER_IDENTITY = {
+  core_keywords: [
+    "people search",
+    "background check",
+    "reverse phone lookup",
+    "public records",
+    "email lookup",
+    "address lookup"
+  ],
+  core_problems: [
+    "identify someone",
+    "verify identity",
+    "check safety",
+    "find information about a person",
+    "who called me",
+    "is this person safe"
+  ],
+  adjacent_problems: [
+    "protect my identity",
+    "who has my data",
+    "is my information exposed",
+    "can i trust this person",
+    "remove my info online",
+    "privacy protection"
+  ]
+};
+
 const SCORE_WEIGHTS = {
   keyword_opportunity: 0.20,
   paid_intent_coverage: 0.16,
@@ -34,84 +61,96 @@ const KEYWORD_CLUSTERS = [
     intent_type: "core",
     priority: "high",
     keywords: ["people search", "find people", "person search", "people finder", "public records"],
-    channels: ["google_ads", "bing_ads", "display"]
+    channels: ["google_ads", "bing_ads", "display"],
+    volume_tier: "High"
   },
   {
     cluster: "background check",
     intent_type: "core",
     priority: "high",
     keywords: ["background check", "criminal records", "court records", "background report"],
-    channels: ["google_ads", "bing_ads", "display"]
+    channels: ["google_ads", "bing_ads", "display"],
+    volume_tier: "High"
   },
   {
     cluster: "reverse phone lookup",
     intent_type: "core",
     priority: "high",
     keywords: ["reverse phone lookup", "phone lookup", "who called me", "unknown caller", "spam caller"],
-    channels: ["google_ads", "bing_ads", "meta_ads", "tiktok_ads", "display"]
+    channels: ["google_ads", "bing_ads", "meta_ads", "tiktok_ads", "display"],
+    volume_tier: "High"
   },
   {
     cluster: "email lookup",
     intent_type: "adjacent",
     priority: "medium-high",
     keywords: ["email lookup", "who owns this email", "reverse email lookup", "email owner lookup"],
-    channels: ["google_ads", "bing_ads", "meta_ads", "display"]
+    channels: ["google_ads", "bing_ads", "meta_ads", "display"],
+    volume_tier: "Medium"
   },
   {
     cluster: "reverse address lookup",
     intent_type: "adjacent",
     priority: "medium-high",
     keywords: ["reverse address lookup", "who lives at this address", "address lookup", "neighbors at address"],
-    channels: ["google_ads", "bing_ads", "meta_ads", "display"]
+    channels: ["google_ads", "bing_ads", "meta_ads", "display"],
+    volume_tier: "Medium"
   },
   {
     cluster: "property records",
     intent_type: "adjacent",
     priority: "medium-high",
     keywords: ["property records", "property owner lookup", "house owner lookup", "real estate records"],
-    channels: ["google_ads", "bing_ads", "display"]
+    channels: ["google_ads", "bing_ads", "display"],
+    volume_tier: "Medium"
   },
   {
     cluster: "privacy protection",
     intent_type: "privacy_adjacent",
     priority: "high",
     keywords: ["privacy protection", "protect my identity", "stop data brokers", "protect my personal data", "identity privacy"],
-    channels: ["google_ads", "meta_ads", "display"]
+    channels: ["google_ads", "meta_ads", "display"],
+    volume_tier: "Medium"
   },
   {
     cluster: "data broker removal",
     intent_type: "privacy_adjacent",
     priority: "high",
     keywords: ["data broker removal", "remove my info online", "delete personal data", "online privacy removal"],
-    channels: ["google_ads", "meta_ads", "display"]
+    channels: ["google_ads", "meta_ads", "display"],
+    volume_tier: "Medium"
   },
   {
     cluster: "identity protection",
     intent_type: "privacy_adjacent",
     priority: "high",
     keywords: ["identity protection", "identity theft prevention", "protect my identity online", "identity monitoring"],
-    channels: ["google_ads", "meta_ads", "display", "tiktok_ads"]
+    channels: ["google_ads", "meta_ads", "display", "tiktok_ads"],
+    volume_tier: "Medium"
   },
   {
     cluster: "dark web / identity exposure",
     intent_type: "expansion",
     priority: "medium-high",
     keywords: ["dark web scan", "is my information online", "identity exposure", "data breach check"],
-    channels: ["meta_ads", "tiktok_ads", "display", "google_ads"]
+    channels: ["meta_ads", "tiktok_ads", "display", "google_ads"],
+    volume_tier: "Medium"
   },
   {
     cluster: "dating / personal safety",
     intent_type: "expansion",
     priority: "medium-high",
     keywords: ["background check before dating", "look up someone before meeting", "is this person safe"],
-    channels: ["meta_ads", "tiktok_ads", "display", "google_ads"]
+    channels: ["meta_ads", "tiktok_ads", "display", "google_ads"],
+    volume_tier: "Low-Medium"
   },
   {
     cluster: "neighbor / neighborhood research",
     intent_type: "expansion",
     priority: "medium",
     keywords: ["who lives near me", "neighborhood lookup", "neighbor lookup", "who lives next door"],
-    channels: ["meta_ads", "display", "google_ads"]
+    channels: ["meta_ads", "display", "google_ads"],
+    volume_tier: "Low-Medium"
   }
 ];
 
@@ -218,9 +257,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_M
 function normalizeInput(urlOrDomain) {
   const raw = String(urlOrDomain || "").trim();
   if (!raw) return "";
-  if (!raw.startsWith("http://") && !raw.startsWith("https://")) {
-    return `https://${raw}`;
-  }
+  if (!raw.startsWith("http://") && !raw.startsWith("https://")) return `https://${raw}`;
   return raw;
 }
 
@@ -268,9 +305,7 @@ async function fetchHtml(url) {
     redirect: "follow"
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch page: HTTP ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`Failed to fetch page: HTTP ${response.status}`);
 
   const html = await response.text();
   const finalUrl = response.url;
@@ -377,14 +412,12 @@ function getClusterPresence(fullText, scrape) {
 function buildKeywordClusters(clusterPresence, brandDomain) {
   return clusterPresence.map((c) => {
     let opportunity = 55;
-
     if (!c.detected) opportunity += 25;
     else if (c.visibility_score < 30) opportunity += 15;
     if (c.intent_type === "adjacent") opportunity += 8;
     if (c.intent_type === "expansion") opportunity += 12;
     if (c.intent_type === "privacy_adjacent") opportunity += 15;
     if (c.priority === "high") opportunity += 5;
-
     opportunity = Math.min(100, opportunity);
 
     return {
@@ -397,6 +430,7 @@ function buildKeywordClusters(clusterPresence, brandDomain) {
       opportunity_level: classifyBand(opportunity),
       representative_keywords: c.keywords.slice(0, 6),
       recommended_channels: c.channels,
+      volume_tier: c.volume_tier,
       why_it_matters: c.detected
         ? `${c.cluster} appears present on the competitor site and likely maps to monetizable demand.`
         : `${c.cluster} looks underrepresented, which may create white-space opportunity for ${brandDomain}.`
@@ -520,30 +554,12 @@ function buildScoreExplanations(scores, clusterPresence, detectedAngles) {
 
   return {
     keyword_opportunity_score: `Scored ${scores.keyword_opportunity_score} because ${underrepresented} clusters appear underrepresented or missing.`,
-    paid_intent_coverage_score: `Scored ${scores.paid_intent_coverage_score} based on visible core demand coverage on the competitor site.`,
+    paid_intent_coverage_score: `Scored ${scores.paid_intent_coverage_score} based on visible core demand coverage.`,
     creative_angle_diversity_score: `Scored ${scores.creative_angle_diversity_score} because ${angleCount} distinct angle families were detected.`,
-    use_case_expansion_score: `Scored ${scores.use_case_expansion_score} based on adjacent, expansion, and privacy-overlap use cases.`,
-    offer_cta_strength_score: `Scored ${scores.offer_cta_strength_score} from CTA clarity and action language.`,
-    funnel_monetization_efficiency_score: `Scored ${scores.funnel_monetization_efficiency_score} from visible result-promise and monetization signals.`,
-    channel_expansion_score: `Scored ${scores.channel_expansion_score} from how broadly themes map across search, social, and display.`,
+    use_case_expansion_score: `Scored ${scores.use_case_expansion_score} from adjacent, expansion, and privacy-overlap use cases.`,
     privacy_adjacent_score: `Scored ${scores.privacy_adjacent_score} because ${privacyDetected} privacy-adjacent clusters were detected or inferred.`,
     testability_score: `Scored ${scores.testability_score} from the number of differentiated experiments that could be launched cleanly.`,
     keyword_pressure_score: `Composite score built from opportunity, coverage, expansion, privacy adjacency, and testability.`
-  };
-}
-
-function buildScoringMethodology() {
-  return {
-    keyword_opportunity_score: "Measures how much category and adjacent keyword white space appears available.",
-    paid_intent_coverage_score: "Measures how strongly the competitor covers core monetizable intent.",
-    creative_angle_diversity_score: "Measures how many distinct user-problem angles are visible.",
-    use_case_expansion_score: "Measures expansion beyond standard category terms into specific jobs-to-be-done.",
-    offer_cta_strength_score: "Measures CTA clarity and directness.",
-    funnel_monetization_efficiency_score: "Measures whether the visible page appears to move users toward action and monetization.",
-    channel_expansion_score: "Measures how well identified themes extend across search, social, and display.",
-    privacy_adjacent_score: "Measures overlap with privacy, identity protection, and data protection positioning.",
-    testability_score: "Measures how many differentiated experiments can be launched with clear hypotheses.",
-    keyword_pressure_score: "Weighted composite across the model."
   };
 }
 
@@ -601,7 +617,6 @@ function buildWhitespaceUseCases() {
 
 function buildTestHypotheses(whitespaceUseCases, creativeAngles) {
   const rows = [];
-
   for (const item of whitespaceUseCases.slice(0, 5)) {
     rows.push({
       title: item.use_case,
@@ -715,6 +730,185 @@ function buildOpportunityModel(priorityTests, assumptions) {
     total_estimated_test_spend: round2(scenarios.reduce((sum, x) => sum + x.estimated_spend, 0)),
     scenarios
   };
+}
+
+function classifyCompetition(fullText, clusterPresence, detectedAngles) {
+  const keywordOverlapHits = countMatches(fullText, TRUTHFINDER_IDENTITY.core_keywords);
+  const keyword_overlap = Math.min(100, keywordOverlapHits * 15);
+
+  const problemOverlapHits = countMatches(
+    fullText,
+    [...TRUTHFINDER_IDENTITY.core_problems, ...TRUTHFINDER_IDENTITY.adjacent_problems]
+  );
+  const problem_overlap = Math.min(100, problemOverlapHits * 12);
+
+  const audience_overlap = Math.min(
+    100,
+    detectedAngles.filter(a =>
+      ["Safety / protect myself", "Identity / scam / fraud concern", "Privacy / control my data"].includes(a.angle)
+    ).length * 28
+  );
+
+  const overlap_score = Math.round(
+    keyword_overlap * 0.4 +
+    problem_overlap * 0.4 +
+    audience_overlap * 0.2
+  );
+
+  let competitor_type = "Indirect";
+  let direct = false;
+
+  if (keyword_overlap > 50) {
+    competitor_type = "Direct";
+    direct = true;
+  } else if (problem_overlap > 60 || audience_overlap > 55) {
+    competitor_type = "Privacy-Adjacent / Problem Competitor";
+  }
+
+  return {
+    direct_competitor: direct,
+    indirect_competitor: true,
+    competitor_type,
+    overlap_score,
+    overlap_breakdown: {
+      keyword_overlap,
+      problem_overlap,
+      audience_overlap
+    },
+    why_they_compete: direct
+      ? "They compete directly on similar high-intent keyword themes and monetize closely related intent."
+      : "They compete by solving adjacent or upstream versions of the same user problems.",
+    how_they_steal_budget: keyword_overlap > 50
+      ? "They likely show up in overlapping auctions, raising CPC and absorbing high-intent traffic."
+      : "They may intercept users earlier with privacy, protection, or trust framing before users search directly for TruthFinder-style solutions.",
+    recommended_response: keyword_overlap > 50
+      ? "Defend shared keywords and improve LP specificity and conversion."
+      : "Expand messaging into their angle and capture upstream demand before it gets framed away from TruthFinder."
+  };
+}
+
+function buildAuctionOverlapEstimator(keywordClusters, competition) {
+  const top_overlap_keywords = keywordClusters
+    .filter(k => ["core", "privacy_adjacent", "adjacent"].includes(k.intent_type))
+    .slice(0, 6)
+    .map(k => ({
+      keyword: k.representative_keywords[0] || k.cluster,
+      volume_tier: k.volume_tier || "Medium",
+      reason: k.detected_on_competitor
+        ? "Competitor appears to have visible relevance here."
+        : "This is a category keyword that could still indicate likely auction proximity."
+    }));
+
+  const auction_overlap_score = Math.round(
+    ((competition.overlap_breakdown?.keyword_overlap || 0) * 0.7) +
+    ((competition.overlap_breakdown?.audience_overlap || 0) * 0.3)
+  );
+
+  let interpretation = "Low expected auction overlap.";
+  if (auction_overlap_score >= 70) interpretation = "High expected auction overlap on top-volume themes.";
+  else if (auction_overlap_score >= 45) interpretation = "Moderate expected auction overlap, especially on shared intent themes.";
+
+  return {
+    auction_overlap_score,
+    interpretation,
+    top_overlap_keywords
+  };
+}
+
+function buildSearchTermAlignment(searchTerms, keywordClusters) {
+  const normalized = (searchTerms || []).map(x => String(x || "").trim()).filter(Boolean);
+
+  const matches = normalized.map(term => {
+    const lower = term.toLowerCase();
+
+    let bestCluster = null;
+    let bestScore = 0;
+
+    for (const cluster of keywordClusters) {
+      const score =
+        countMatches(lower, [cluster.cluster]) +
+        countMatches(lower, cluster.representative_keywords || []);
+      if (score > bestScore) {
+        bestScore = score;
+        bestCluster = cluster;
+      }
+    }
+
+    return {
+      search_term: term,
+      matched_cluster: bestCluster ? bestCluster.cluster : "No strong match",
+      competition_signal: bestCluster
+        ? `${bestCluster.opportunity_level} competition / opportunity`
+        : "Unknown"
+    };
+  });
+
+  const alignedCount = matches.filter(m => m.matched_cluster !== "No strong match").length;
+  const alignment_score = normalized.length
+    ? Math.round((alignedCount / normalized.length) * 100)
+    : 0;
+
+  let interpretation = "No search terms were provided.";
+  if (normalized.length) {
+    if (alignment_score >= 75) interpretation = "Your search terms line up strongly to modeled category themes.";
+    else if (alignment_score >= 45) interpretation = "Your search terms partially line up to the modeled themes.";
+    else interpretation = "Your search terms show limited alignment to the modeled themes.";
+  }
+
+  return {
+    alignment_score,
+    interpretation,
+    matches
+  };
+}
+
+function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competition) {
+  const plays = [];
+
+  const topKeywordCluster = keywordClusters[0];
+  if (topKeywordCluster) {
+    plays.push({
+      play_name: `Own the sharper version of ${topKeywordCluster.cluster}`,
+      target_cluster: topKeywordCluster.cluster,
+      what_to_launch: `Build more specific ad groups and landing pages than the competitor for ${topKeywordCluster.cluster}.`,
+      why_this_can_work: "Sharper intent matching often beats broader competitor positioning.",
+      expected_outcome: "Higher CTR and better conversion quality on shared demand."
+    });
+  }
+
+  const privacyCluster = keywordClusters.find(k => k.intent_type === "privacy_adjacent");
+  if (privacyCluster) {
+    plays.push({
+      play_name: "Bridge lookup intent with privacy concern",
+      target_cluster: privacyCluster.cluster,
+      what_to_launch: "Launch campaigns that frame TruthFinder as both a lookup tool and a self-exposure awareness tool.",
+      why_this_can_work: "This lets TruthFinder compete against privacy brands without abandoning its core utility edge.",
+      expected_outcome: "Access to adjacent demand that privacy-only brands currently frame first."
+    });
+  }
+
+  const safetyAngle = creativeAngles.find(a => a.angle === "Safety / protect myself");
+  if (safetyAngle) {
+    plays.push({
+      play_name: "Win on emotional specificity",
+      target_cluster: safetyAngle.angle,
+      what_to_launch: `Use hooks like "${safetyAngle.hook_templates[0]}" with scenario-led ad copy.`,
+      why_this_can_work: "Scenario-led ads often outperform generic feature messaging in paid social and upper-funnel search.",
+      expected_outcome: "More qualified traffic from users with urgent, emotionally clear needs."
+    });
+  }
+
+  if (competition.competitor_type !== "Direct") {
+    plays.push({
+      play_name: "Capture upstream privacy-aware traffic",
+      target_cluster: "privacy-aware audience",
+      what_to_launch: "Create campaigns and LPs for users asking what others can find about them online.",
+      why_this_can_work: "Indirect competitors often reshape demand before it reaches direct lookup auctions.",
+      expected_outcome: "Incremental audience reach and earlier funnel capture."
+    });
+  }
+
+  return plays.slice(0, 6);
 }
 
 async function analyzeSerps(domain, env) {
@@ -833,6 +1027,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const market = String(payload.market || "people_search");
   const device = String(payload.device || "mobile");
   const analystQuestions = String(payload.questions || "").trim();
+  const searchTerms = Array.isArray(payload.search_terms) ? payload.search_terms : [];
 
   const assumptions = {
     benchmark_ctr_pct: Number(payload.benchmark_ctr_pct || 4),
@@ -848,7 +1043,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const domain = domainFromUrl(scrape.final_url);
   const competitorName = domain.replace(".com", "").replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const fullText = getFullText(scrape);
+  const fullText = getFullText(scrape).toLowerCase();
   const clusterPresence = getClusterPresence(fullText, scrape);
   const keyword_clusters = buildKeywordClusters(clusterPresence, brandDomain);
   const underutilized_keywords = buildUnderutilizedKeywords(clusterPresence, brandDomain);
@@ -857,45 +1052,45 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const whitespace_use_cases = buildWhitespaceUseCases();
   const scores = scoreModel(clusterPresence, detectedAngles, scrape);
 
+  const competition_classification = classifyCompetition(fullText, clusterPresence, detectedAngles);
+  const auction_overlap_estimator = buildAuctionOverlapEstimator(keyword_clusters, competition_classification);
+  const search_term_alignment = buildSearchTermAlignment(searchTerms, keyword_clusters);
+  const steal_their_traffic_engine = buildStealTheirTrafficEngine(keyword_clusters, detectedAngles, competition_classification);
+
   const score_explanations = buildScoreExplanations(scores, clusterPresence, detectedAngles);
-  const scoring_methodology = buildScoringMethodology();
   const pressure_drivers = buildPressureDrivers(scores);
   const pressure_summary = buildPressureSummary(scores, pressure_drivers, brandDomain);
-  const detected_hooks = detectedAngles.filter((a) => a.detected).slice(0, 6).map((a) => a.angle);
-  const detected_funnel_steps = ["Homepage / intent capture"];
-  const evidence_extracts = buildEvidenceExtracts(scrape);
-  const creative_summary_base = buildCreativeSummary(detectedAngles);
 
+  const creative_summary_base = buildCreativeSummary(detectedAngles);
   let ad_creatives = buildAdCreativeCards(detectedAngles, competitorName);
   const liveCreativePayload = await maybeCreativeFeed(domain, env);
   if ((liveCreativePayload.ad_creatives || []).length) {
     ad_creatives = liveCreativePayload.ad_creatives;
   }
-
   const creative_summary = (liveCreativePayload.ad_creatives || []).length
     ? liveCreativePayload.creative_summary
     : creative_summary_base;
 
   const serps = await analyzeSerps(domain, env);
   const channel_recommendations = buildChannelRecommendations(keyword_clusters, detectedAngles);
-  const data_sources = buildDataSources(scrape, serps, ad_creatives);
   const test_hypotheses = buildTestHypotheses(whitespace_use_cases, creative_angles);
   const priority_tests = buildPriorityTests(keyword_clusters, whitespace_use_cases, underutilized_keywords, detectedAngles);
   const opportunity_model = buildOpportunityModel(priority_tests, assumptions);
+  const data_sources = buildDataSources(scrape, serps, ad_creatives);
 
   const key_observations = [
-    `Top keyword opportunity areas: ${keyword_clusters.slice(0, 3).map((k) => k.cluster).join(", ") || "not enough data"}.`,
-    `Top creative angle signals: ${creative_angles.filter((a) => a.detected).slice(0, 3).map((a) => a.angle).join(", ") || "not strongly differentiated"}.`,
-    `${underutilized_keywords.length} underutilized keyword ideas were generated.`,
-    `Estimated incremental sales across proposed priority tests: ${opportunity_model.total_estimated_incremental_sales}.`
+    `Competitor type vs TruthFinder: ${competition_classification.competitor_type}.`,
+    `Estimated auction overlap score: ${auction_overlap_estimator.auction_overlap_score}.`,
+    `Search term alignment score: ${search_term_alignment.alignment_score}.`,
+    `Estimated incremental sales across priority tests: ${opportunity_model.total_estimated_incremental_sales}.`
   ];
 
   const action_plan = [
-    "Launch tightly segmented campaigns around the top opportunity clusters.",
-    "Build at least one privacy-adjacent campaign theme that frames TruthFinder as a self-exposure insight tool.",
-    "Test one white-space use case in paid social and one in search.",
-    "Create landing pages matched to each major use case instead of relying on generic messaging.",
-    "Measure winners at the query and use-case level, not only at campaign level."
+    "Defend the highest-overlap demand themes with more specific segmentation and tighter landing-page matching.",
+    "Launch at least one privacy-adjacent bridge campaign to compete with identity / privacy brands.",
+    "Use search term alignment results to decide which existing terms are worth protecting or expanding.",
+    "Run at least one steal-their-traffic play in search and one in paid social.",
+    "Measure winners at the use-case and term level, not just campaign level."
   ];
 
   return {
@@ -905,11 +1100,15 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     market,
     device,
     analyst_questions: analystQuestions,
-
     page_title: scrape.title,
     meta_description: scrape.meta_description,
     headline: scrape.h1,
     summary: buildSummary(domain, scores, keyword_clusters, detectedAngles, brandDomain),
+
+    competition_classification,
+    auction_overlap_estimator,
+    search_term_alignment,
+    steal_their_traffic_engine,
 
     keyword_opportunity_score: scores.keyword_opportunity_score,
     paid_intent_coverage_score: scores.paid_intent_coverage_score,
@@ -923,18 +1122,9 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     keyword_pressure_score: scores.keyword_pressure_score,
     pressure_band: scores.pressure_band,
 
-    trust_score: Math.round((scores.paid_intent_coverage_score + scores.offer_cta_strength_score) / 2),
-    urgency_score: Math.round((scores.offer_cta_strength_score + scores.funnel_monetization_efficiency_score) / 2),
-    utility_score: scores.keyword_opportunity_score,
-    value_score: Math.round((scores.keyword_opportunity_score + scores.use_case_expansion_score) / 2),
-    emotional_score: Math.round((scores.creative_angle_diversity_score + scores.channel_expansion_score) / 2),
-    seo_signal_score: Math.round((scores.paid_intent_coverage_score + scores.use_case_expansion_score) / 2),
-
     score_explanations,
-    scoring_methodology,
     pressure_summary,
     pressure_drivers,
-
     keyword_clusters,
     underutilized_keywords,
     whitespace_use_cases,
@@ -943,19 +1133,13 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     test_hypotheses,
     priority_tests,
     opportunity_model,
-
     data_sources,
-    detected_hooks,
-    detected_funnel_steps,
-    key_observations,
-    action_plan,
-    evidence_extracts,
-
     creative_summary,
     ad_creatives,
     serps,
-    screenshots: [],
-
+    evidence_extracts: buildEvidenceExtracts(scrape),
+    key_observations,
+    action_plan,
     crawl_notes: [
       `Fetched ${scrape.final_url} with HTTP ${scrape.status_code}`,
       `Parsed ${(scrape.links || []).length} internal links, ${(scrape.button_texts || []).length} buttons, and ${(scrape.anchor_texts || []).length} anchor texts`,
@@ -963,6 +1147,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
       `Brand comparison anchor: ${brandDomain}`,
       `Analysis context: market=${market}, device=${device}`,
       `Benchmark assumptions: CTR=${assumptions.benchmark_ctr_pct}%, CVR=${assumptions.benchmark_cvr_pct}%, CPC=$${assumptions.benchmark_cpc}, monthly_impr=${assumptions.benchmark_monthly_impressions}`,
+      searchTerms.length ? `Search terms supplied: ${searchTerms.length}` : "No search terms supplied.",
       analystQuestions ? `Analyst focus questions: ${analystQuestions}` : "No custom analyst questions supplied.",
       "No persistent storage is used; each analysis is generated fresh per request."
     ]
@@ -972,8 +1157,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 export async function onRequestPost(context) {
   try {
     const payload = await context.request.json();
-    const inputUrl = payload?.url || "";
-    const result = await analyzeCompetitor(inputUrl, context.env, payload);
+    const result = await analyzeCompetitor(payload?.url || "", context.env, payload);
 
     return new Response(JSON.stringify(result), {
       status: 200,
