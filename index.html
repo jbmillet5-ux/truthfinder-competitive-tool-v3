@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TruthFinder Competitive Growth War Room</title>
+  <title>Portfolio Competitive Growth War Room</title>
   <style>
     :root{
       --bg:#0b0d10;
@@ -31,7 +31,7 @@
     }
 
     .container {
-      max-width: 1550px;
+      max-width: 1600px;
       margin: 0 auto;
     }
 
@@ -81,7 +81,7 @@
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 110px;
       resize: vertical;
     }
 
@@ -99,6 +99,18 @@
       background: #27303c;
       color: var(--text);
       border: 1px solid #445061;
+    }
+
+    button.smallBtn {
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    button.removeBtn {
+      background: #3a1d1d;
+      color: #ffd3d3;
+      border: 1px solid #6b3232;
     }
 
     button:disabled {
@@ -220,7 +232,7 @@
 
     .keyValue {
       display: grid;
-      grid-template-columns: 170px 1fr;
+      grid-template-columns: 190px 1fr;
       gap: 8px 12px;
       align-items: start;
     }
@@ -281,20 +293,45 @@
       font-size: 13px;
       color: #d6dde6;
     }
+
+    .portfolioList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .portfolioItem {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1a273b;
+      color: var(--blue);
+      border: 1px solid #334a70;
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .portfolioItem button {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>TruthFinder Competitive Growth War Room</h1>
+    <h1>Portfolio Competitive Growth War Room</h1>
     <div class="sub">
-      Analyze direct competitors, privacy-adjacent competitors, auction overlap, search term alignment,
-      angle generation, and where TruthFinder can steal traffic with sharper PPC strategy.
+      Analyze a brand against a portfolio of competitors, estimate auction overlap, compare search term alignment,
+      generate white-space ideas, and surface outside-the-box new market angles for products built on public-records data.
     </div>
 
     <div class="card">
       <div class="row">
         <div class="grow">
-          <label for="urlInput">Competitor URL or domain</label>
+          <label for="urlInput">Brand URL or domain to analyze</label>
           <input id="urlInput" type="text" placeholder="e.g. beenverified.com or cloaked.com" />
         </div>
 
@@ -329,15 +366,37 @@ background check before dating"></textarea>
         <div class="grow">
           <label for="questionInput">What do you want solved?</label>
           <textarea id="questionInput" placeholder="Examples:
-- Is this brand a real competitor to TruthFinder?
-- What search terms overlap with ours?
+- Is this brand a real competitor to our portfolio?
+- What search terms overlap with our themes?
 - Where can we steal their traffic?
-- What privacy-adjacent angles should we test?
-- Give me new, crazy but relevant marketing ideas."></textarea>
+- What new markets could our data unlock?
+- Give me weird but testable ideas outside the current category."></textarea>
         </div>
       </div>
 
-      <div class="row" style="margin-top:12px;">
+      <div class="card" style="margin-top:16px; margin-bottom:0;">
+        <h3 style="margin-bottom:10px;">Portfolio Competitor Set</h3>
+        <div class="small">
+          This list is sent with each analysis so the entered brand is benchmarked against the full portfolio instead of only TruthFinder.
+        </div>
+
+        <div class="row" style="margin-top:12px; align-items:end;">
+          <div class="grow">
+            <label for="newCompetitorInput">Add competitor domain</label>
+            <input id="newCompetitorInput" type="text" placeholder="e.g. newcompetitor.com" />
+          </div>
+          <div class="narrow">
+            <button id="addCompetitorBtn" class="secondary">Add Competitor</button>
+          </div>
+          <div class="narrow">
+            <button id="resetPortfolioBtn" class="secondary">Reset Defaults</button>
+          </div>
+        </div>
+
+        <div id="portfolioList" class="portfolioList"></div>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
         <div class="narrow">
           <label for="benchmarkCtr">Assumed CTR %</label>
           <input id="benchmarkCtr" type="number" step="0.1" value="4.0" />
@@ -374,7 +433,7 @@ background check before dating"></textarea>
         </div>
 
         <div class="card">
-          <h2>Competitive Relationship to TruthFinder</h2>
+          <h2>Competitive Relationship to Portfolio</h2>
           <div id="competition"></div>
         </div>
       </div>
@@ -389,6 +448,11 @@ background check before dating"></textarea>
           <h2>Search Terms Alignment</h2>
           <div id="searchTermAlignment"></div>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Portfolio Benchmark Snapshot</h2>
+        <div id="portfolioBenchmark"></div>
       </div>
 
       <div class="card">
@@ -472,11 +536,32 @@ background check before dating"></textarea>
   </div>
 
   <script>
+    const DEFAULT_PORTFOLIO = [
+      "beenverified.com",
+      "spokeo.com",
+      "cloaked.com",
+      "peoplefinders.com",
+      "whitepages.com",
+      "fastpeoplesearch.com",
+      "truepeoplesearch.com",
+      "usphonebook.com",
+      "peoplelooker.com",
+      "intelius.com",
+      "instantcheckmate.com",
+      "ussearch.com"
+    ];
+
+    let portfolioCompetitors = [...DEFAULT_PORTFOLIO];
+
     const urlInput = document.getElementById("urlInput");
     const marketSelect = document.getElementById("marketSelect");
     const deviceSelect = document.getElementById("deviceSelect");
     const searchTermsInput = document.getElementById("searchTermsInput");
     const questionInput = document.getElementById("questionInput");
+    const newCompetitorInput = document.getElementById("newCompetitorInput");
+    const addCompetitorBtn = document.getElementById("addCompetitorBtn");
+    const resetPortfolioBtn = document.getElementById("resetPortfolioBtn");
+    const portfolioListEl = document.getElementById("portfolioList");
     const benchmarkCtr = document.getElementById("benchmarkCtr");
     const benchmarkCvr = document.getElementById("benchmarkCvr");
     const benchmarkCpc = document.getElementById("benchmarkCpc");
@@ -499,12 +584,53 @@ background check before dating"></textarea>
         .replaceAll("'", "&#039;");
     }
 
+    function normalizeDomain(value) {
+      let v = String(value || "").trim().toLowerCase();
+      v = v.replace(/^https?:\/\//, "");
+      v = v.replace(/^www\./, "");
+      v = v.split("/")[0];
+      return v;
+    }
+
     function levelClass(level) {
       const s = String(level || "").toLowerCase();
       if (s.includes("high")) return "red";
       if (s.includes("medium")) return "gold";
       return "green";
     }
+
+    function renderPortfolioList() {
+      portfolioListEl.innerHTML = portfolioCompetitors.map((domain, idx) => `
+        <div class="portfolioItem">
+          <span>${escapeHtml(domain)}</span>
+          <button class="removeBtn smallBtn" data-index="${idx}">Remove</button>
+        </div>
+      `).join("");
+
+      portfolioListEl.querySelectorAll(".removeBtn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-index"));
+          portfolioCompetitors.splice(idx, 1);
+          renderPortfolioList();
+        });
+      });
+    }
+
+    addCompetitorBtn.addEventListener("click", () => {
+      const domain = normalizeDomain(newCompetitorInput.value);
+      if (!domain) return;
+      if (!portfolioCompetitors.includes(domain)) {
+        portfolioCompetitors.push(domain);
+        portfolioCompetitors.sort();
+      }
+      newCompetitorInput.value = "";
+      renderPortfolioList();
+    });
+
+    resetPortfolioBtn.addEventListener("click", () => {
+      portfolioCompetitors = [...DEFAULT_PORTFOLIO];
+      renderPortfolioList();
+    });
 
     async function safeJsonFetch(url, options) {
       const response = await fetch(url, options);
@@ -516,11 +642,12 @@ background check before dating"></textarea>
 
     function renderOverview(data) {
       const rows = [
-        ["Competitor", data.competitor_name],
+        ["Analyzed Brand", data.competitor_name],
         ["Domain", data.domain],
         ["Input URL", data.input_url],
         ["Market", data.market],
         ["Device", data.device],
+        ["Portfolio Size", (data.portfolio_benchmark?.portfolio_competitors || []).length],
         ["Summary", data.summary]
       ];
       document.getElementById("overview").innerHTML = rows.map(([k, v]) => `
@@ -603,6 +730,36 @@ background check before dating"></textarea>
             </tbody>
           </table>
         ` : `<div class="small" style="margin-top:10px;">No search term matches returned.</div>`}
+      `;
+    }
+
+    function renderPortfolioBenchmark(data) {
+      const p = data.portfolio_benchmark || {};
+      const overlaps = p.overlap_by_competitor || [];
+
+      document.getElementById("portfolioBenchmark").innerHTML = `
+        <div class="small"><strong>Benchmark Mode:</strong> Portfolio-based</div>
+        <div class="small" style="margin-top:6px;"><strong>Portfolio Competitors:</strong> ${escapeHtml((p.portfolio_competitors || []).join(", "))}</div>
+        ${overlaps.length ? `
+          <table>
+            <thead>
+              <tr>
+                <th>Portfolio Competitor</th>
+                <th>Estimated Similarity</th>
+                <th>Classification Hint</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${overlaps.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.competitor)}</td>
+                  <td>${escapeHtml(r.similarity_score)}</td>
+                  <td>${escapeHtml(r.reason)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        ` : `<div class="small" style="margin-top:10px;">No portfolio benchmark rows returned.</div>`}
       `;
     }
 
@@ -786,8 +943,8 @@ background check before dating"></textarea>
             <div class="boxTitle">${escapeHtml(r.idea_name || "")}</div>
             <div class="small"><strong>Hook:</strong> ${escapeHtml(r.marketing_hook || "")}</div>
             <div class="small" style="margin-top:6px;"><strong>Customer problem:</strong> ${escapeHtml(r.customer_problem || "")}</div>
-            <div class="small" style="margin-top:6px;"><strong>Why TruthFinder can help:</strong> ${escapeHtml(r.why_truthfinder_can_help || "")}</div>
-            <div class="small" style="margin-top:6px;"><strong>Suggested channel:</strong> ${escapeHtml((r.suggested_channels || []).join(", "))}</div>
+            <div class="small" style="margin-top:6px;"><strong>Why your public-record data can help:</strong> ${escapeHtml(r.why_truthfinder_can_help || "")}</div>
+            <div class="small" style="margin-top:6px;"><strong>Suggested channels:</strong> ${escapeHtml((r.suggested_channels || []).join(", "))}</div>
             <div class="small" style="margin-top:6px;"><strong>Test format:</strong> ${escapeHtml(r.test_format || "")}</div>
             <div class="small" style="margin-top:6px;"><strong>Why test this:</strong> ${escapeHtml(r.why_test_this || "")}</div>
           </div>
@@ -873,6 +1030,7 @@ background check before dating"></textarea>
       if (!data.search_term_alignment) warnings.push("No search term alignment returned.");
       if (!data.steal_their_traffic_engine?.length) warnings.push("No traffic-stealing plays returned.");
       if (!data.angle_generator?.length) warnings.push("No angle generator ideas returned.");
+      if (!data.portfolio_benchmark) warnings.push("No portfolio benchmark returned.");
 
       if (warnings.length) {
         warningEl.classList.remove("hidden");
@@ -889,6 +1047,7 @@ background check before dating"></textarea>
       renderCompetition(data);
       renderAuctionOverlap(data);
       renderSearchTermAlignment(data);
+      renderPortfolioBenchmark(data);
       renderStealTraffic(data);
       renderScores(data);
       renderOpportunityModel(data);
@@ -916,12 +1075,12 @@ background check before dating"></textarea>
       latestResult = null;
 
       if (!url) {
-        errorEl.textContent = "Please enter a competitor URL or domain.";
+        errorEl.textContent = "Please enter a brand URL or domain.";
         return;
       }
 
       runBtn.disabled = true;
-      statusEl.textContent = "Running analysis...";
+      statusEl.textContent = "Running portfolio analysis...";
 
       try {
         const payload = {
@@ -933,6 +1092,7 @@ background check before dating"></textarea>
             .split("\n")
             .map(x => x.trim())
             .filter(Boolean),
+          portfolio_competitors: portfolioCompetitors,
           benchmark_ctr_pct: Number(benchmarkCtr.value || 4),
           benchmark_cvr_pct: Number(benchmarkCvr.value || 3),
           benchmark_cpc: Number(benchmarkCpc.value || 2.5),
@@ -966,7 +1126,8 @@ background check before dating"></textarea>
         ...(((latestResult.opportunity_model || {}).scenarios || []).map(v => ({ category: "opportunity_scenario", value: `${v.scenario} | ${v.target} | sales=${v.estimated_sales}` }))),
         ...((latestResult.steal_their_traffic_engine || []).map(v => ({ category: "steal_traffic_play", value: `${v.play_name} | ${v.target_cluster}` }))),
         ...(((latestResult.search_term_alignment || {}).matches || []).map(v => ({ category: "search_term_match", value: `${v.search_term} | ${v.matched_cluster}` }))),
-        ...((latestResult.angle_generator || []).map(v => ({ category: "angle_generator", value: `${v.idea_name} | ${v.marketing_hook}` })))
+        ...((latestResult.angle_generator || []).map(v => ({ category: "angle_generator", value: `${v.idea_name} | ${v.marketing_hook}` }))),
+        ...((((latestResult.portfolio_benchmark || {}).overlap_by_competitor) || []).map(v => ({ category: "portfolio_overlap", value: `${v.competitor} | ${v.similarity_score}` })))
       ];
 
       try {
@@ -985,7 +1146,7 @@ background check before dating"></textarea>
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = downloadUrl;
-        a.download = "truthfinder_growth_opportunity_plan.csv";
+        a.download = "portfolio_growth_opportunity_plan.csv";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -994,6 +1155,8 @@ background check before dating"></textarea>
         errorEl.textContent = err.message || String(err);
       }
     });
+
+    renderPortfolioList();
   </script>
 </body>
 </html>
