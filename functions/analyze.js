@@ -160,42 +160,66 @@ const CREATIVE_ANGLES = [
     triggers: ["reverse phone", "phone lookup", "who called", "unknown caller", "spam caller", "number"],
     user_problem: "I need to identify who is calling me.",
     best_channels: ["google_ads", "bing_ads", "meta_ads", "tiktok_ads"],
-    hook_templates: ["Who just called you?", "Unknown number? Get answers fast.", "Find out who is behind that number."]
+    hook_templates: [
+      "Who just called you?",
+      "Unknown number? Get answers fast.",
+      "Find out who is behind that number."
+    ]
   },
   {
     angle: "Safety / protect myself",
     triggers: ["safe", "protect", "security", "verify", "background", "criminal", "records"],
     user_problem: "I want to reduce risk before interacting with someone.",
     best_channels: ["google_ads", "meta_ads", "display", "tiktok_ads"],
-    hook_templates: ["Know more before you meet.", "A quick check can save you a major mistake.", "Feel more confident before taking the next step."]
+    hook_templates: [
+      "Know more before you meet.",
+      "A quick check can save you a major mistake.",
+      "Feel more confident before taking the next step."
+    ]
   },
   {
     angle: "Privacy / control my data",
     triggers: ["privacy", "protect data", "remove my info", "identity protection", "data broker", "exposed"],
     user_problem: "I want more control over how exposed my personal information is.",
     best_channels: ["google_ads", "meta_ads", "display"],
-    hook_templates: ["See what your digital footprint is exposing.", "Know what others can find about you.", "Take back control of your information."]
+    hook_templates: [
+      "See what your digital footprint is exposing.",
+      "Know what others can find about you.",
+      "Take back control of your information."
+    ]
   },
   {
     angle: "Identity / scam / fraud concern",
     triggers: ["email", "identity", "scam", "fraud", "dark web", "exposure", "verify"],
     user_problem: "I need to validate identity or check for risk.",
     best_channels: ["meta_ads", "tiktok_ads", "display", "google_ads"],
-    hook_templates: ["Validate before you trust.", "Check the identity behind the message.", "See what could be putting you at risk."]
+    hook_templates: [
+      "Validate before you trust.",
+      "Check the identity behind the message.",
+      "See what could be putting you at risk."
+    ]
   },
   {
     angle: "Reconnection / find someone",
     triggers: ["find people", "people search", "locate", "reconnect", "find someone"],
     user_problem: "I want to find or reconnect with someone.",
     best_channels: ["google_ads", "bing_ads", "meta_ads"],
-    hook_templates: ["Trying to find someone?", "Reconnect with more context.", "Find people faster."]
+    hook_templates: [
+      "Trying to find someone?",
+      "Reconnect with more context.",
+      "Find people faster."
+    ]
   },
   {
     angle: "Property / address research",
     triggers: ["address", "property", "owner", "reverse address", "residents"],
     user_problem: "I want to know more about a home, address, or the people tied to it.",
     best_channels: ["google_ads", "bing_ads", "display", "meta_ads"],
-    hook_templates: ["Who lives there?", "Research an address before you decide.", "Get more context on a property."]
+    hook_templates: [
+      "Who lives there?",
+      "Research an address before you decide.",
+      "Get more context on a property."
+    ]
   }
 ];
 
@@ -241,6 +265,99 @@ const WHITE_SPACE_USE_CASES = [
     channels: ["google_ads", "meta_ads", "display"],
     why_it_is_white_space: "Homeowner trust is not a common direct-response angle in the category.",
     why_fund: "It maps to high perceived risk and clear trust intent."
+  }
+];
+
+const ANGLE_GENERATOR_LIBRARY = [
+  {
+    idea_name: "Digital Self-Exposure Check",
+    marketing_hook: "See what strangers could learn about you in minutes.",
+    customer_problem: "People are worried their information is too easy to find online, but do not know what is actually exposed.",
+    why_truthfinder_can_help: "TruthFinder’s public-records data can help a user understand how discoverable and exposed they may appear to others.",
+    suggested_channels: ["meta_ads", "google_ads", "display"],
+    test_format: "Paid social video + landing page quiz",
+    why_test_this: "This bridges privacy anxiety with TruthFinder’s existing data strengths and opens a new top-of-funnel use case."
+  },
+  {
+    idea_name: "Before You Meet, Know More",
+    marketing_hook: "A quick search before you meet can save you a major mistake.",
+    customer_problem: "People want more confidence before meeting someone from dating apps, marketplaces, or local transactions.",
+    why_truthfinder_can_help: "TruthFinder can help surface public-record context that makes a person feel more informed before an in-person interaction.",
+    suggested_channels: ["meta_ads", "tiktok_ads", "display"],
+    test_format: "Scenario-led paid social creative",
+    why_test_this: "This is emotional, vivid, and naturally suited for short-form story-based ads."
+  },
+  {
+    idea_name: "Unknown Caller Family Protection",
+    marketing_hook: "Help protect your family from unknown callers and suspicious contacts.",
+    customer_problem: "People are often worried about spam, scams, or suspicious outreach to parents and family members.",
+    why_truthfinder_can_help: "TruthFinder’s lookup capabilities can help identify who may be behind a number or contact pattern.",
+    suggested_channels: ["meta_ads", "google_ads", "display"],
+    test_format: "Problem-solution search + retargeting",
+    why_test_this: "Family protection is a stronger emotional frame than generic reverse-phone messaging."
+  },
+  {
+    idea_name: "Who Are You Moving Near?",
+    marketing_hook: "Know more about a neighborhood before you sign the lease.",
+    customer_problem: "People moving to a new home or apartment often want more confidence about the area and the people nearby.",
+    why_truthfinder_can_help: "TruthFinder’s public-records data can support address, resident, and neighborhood-context discovery.",
+    suggested_channels: ["google_ads", "meta_ads", "display"],
+    test_format: "Search intent campaign + dedicated LP",
+    why_test_this: "This is a life-event-driven use case that may convert better than broad category traffic."
+  },
+  {
+    idea_name: "Marketplace Transaction Safety",
+    marketing_hook: "Verify before you meet, buy, or send money.",
+    customer_problem: "People buying and selling through peer-to-peer marketplaces worry about fraud and unsafe meetups.",
+    why_truthfinder_can_help: "TruthFinder can provide more identity context before a buyer or seller commits to meeting or transacting.",
+    suggested_channels: ["meta_ads", "tiktok_ads", "display"],
+    test_format: "Short-form paid social narratives",
+    why_test_this: "This maps to a real fear and is not typically owned clearly by traditional people-search advertisers."
+  },
+  {
+    idea_name: "Roommate / Tenant Confidence",
+    marketing_hook: "Know more before you share a home.",
+    customer_problem: "People choosing roommates, tenants, or subletters want more trust and less uncertainty.",
+    why_truthfinder_can_help: "TruthFinder’s public-records data can help a user gather context before agreeing to live with or rent to someone.",
+    suggested_channels: ["google_ads", "meta_ads", "display"],
+    test_format: "Use-case specific search campaigns",
+    why_test_this: "Very concrete, highly relatable problem with strong intent."
+  },
+  {
+    idea_name: "Your First-Date Reputation Check",
+    marketing_hook: "Before the date, know a little more.",
+    customer_problem: "People dating online want more confidence that someone is who they say they are.",
+    why_truthfinder_can_help: "TruthFinder can help validate identity and provide deeper public-record context before the first meeting.",
+    suggested_channels: ["meta_ads", "tiktok_ads", "display"],
+    test_format: "Emotional direct-response social ads",
+    why_test_this: "Strong emotional relevance and easy-to-understand value proposition."
+  },
+  {
+    idea_name: "Contractor Trust Check",
+    marketing_hook: "Before they enter your home, know a little more.",
+    customer_problem: "Homeowners want more confidence before letting contractors or workers into their home.",
+    why_truthfinder_can_help: "TruthFinder’s public-records context can help reduce uncertainty before making a trust decision.",
+    suggested_channels: ["google_ads", "meta_ads", "display"],
+    test_format: "Search + landing page use-case framing",
+    why_test_this: "This is a fresh homeowner-trust angle that most category players do not message directly."
+  },
+  {
+    idea_name: "Teen Safety / Parent Reassurance",
+    marketing_hook: "Know more before your family says yes.",
+    customer_problem: "Parents worry about who their teens are meeting, dating, or spending time with.",
+    why_truthfinder_can_help: "TruthFinder can provide additional public-record context to help parents feel more informed.",
+    suggested_channels: ["meta_ads", "display"],
+    test_format: "Emotion-led paid social tests",
+    why_test_this: "Very strong emotional motivation and underused framing."
+  },
+  {
+    idea_name: "Job Search Self-Audit",
+    marketing_hook: "See what others could find about you before they do.",
+    customer_problem: "People applying for jobs may worry about what hiring managers or others can find about them online.",
+    why_truthfinder_can_help: "TruthFinder can help users understand their discoverability and what public information may shape first impressions.",
+    suggested_channels: ["google_ads", "meta_ads", "display"],
+    test_format: "Self-audit landing page + search ads",
+    why_test_this: "This creates a new self-serve, self-awareness use case that is adjacent to privacy and identity."
   }
 ];
 
@@ -911,6 +1028,62 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
   return plays.slice(0, 6);
 }
 
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
+  const ideas = [...ANGLE_GENERATOR_LIBRARY];
+
+  const topKeyword = keywordClusters[0];
+  if (topKeyword) {
+    ideas.push({
+      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
+      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
+      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
+      why_truthfinder_can_help: `TruthFinder already has strong data relevance for ${topKeyword.cluster} and can likely present a more concrete problem-solution flow.`,
+      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
+      test_format: "Dedicated campaign + use-case LP",
+      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
+    });
+  }
+
+  const privacyAngle = creativeAngles.find(a => a.angle === "Privacy / control my data");
+  if (privacyAngle) {
+    ideas.push({
+      idea_name: "Public Record Footprint Awareness",
+      marketing_hook: "Know what your public footprint may be saying about you.",
+      customer_problem: "Users may not realize how much public-record context exists around them.",
+      why_truthfinder_can_help: "TruthFinder’s data makes it possible to turn vague exposure anxiety into a visible and understandable problem.",
+      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Awareness-driven landing page + social creative",
+      why_test_this: "This bridges people-search utility with privacy positioning."
+    });
+  }
+
+  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
+    ideas.push({
+      idea_name: "Privacy-to-Lookup Bridge",
+      marketing_hook: "Not just privacy. Know what’s actually out there.",
+      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
+      why_truthfinder_can_help: "TruthFinder can serve as the ‘understand first’ step before users decide what to remove, protect, or investigate.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Bridge-message campaign",
+      why_test_this: "This can let TruthFinder compete upstream against privacy brands without pretending to be the same product."
+    });
+  }
+
+  for (const item of whitespaceUseCases.slice(0, 2)) {
+    ideas.push({
+      idea_name: `${item.use_case} Expansion`,
+      marketing_hook: item.suggested_angle,
+      customer_problem: item.use_case,
+      why_truthfinder_can_help: "TruthFinder’s public-records data can reduce uncertainty and provide real-world context before a trust decision is made.",
+      suggested_channels: item.channels || ["meta_ads"],
+      test_format: "Single-problem campaign test",
+      why_test_this: item.why_fund
+    });
+  }
+
+  return ideas.slice(0, 14);
+}
+
 async function analyzeSerps(domain, env) {
   const apiKey = String(env.SERPAPI_KEY || "").trim();
   const rows = [];
@@ -1056,6 +1229,12 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const auction_overlap_estimator = buildAuctionOverlapEstimator(keyword_clusters, competition_classification);
   const search_term_alignment = buildSearchTermAlignment(searchTerms, keyword_clusters);
   const steal_their_traffic_engine = buildStealTheirTrafficEngine(keyword_clusters, detectedAngles, competition_classification);
+  const angle_generator = buildAngleGenerator(
+    keyword_clusters,
+    creative_angles,
+    whitespace_use_cases,
+    competition_classification
+  );
 
   const score_explanations = buildScoreExplanations(scores, clusterPresence, detectedAngles);
   const pressure_drivers = buildPressureDrivers(scores);
@@ -1090,6 +1269,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     "Launch at least one privacy-adjacent bridge campaign to compete with identity / privacy brands.",
     "Use search term alignment results to decide which existing terms are worth protecting or expanding.",
     "Run at least one steal-their-traffic play in search and one in paid social.",
+    "Test 3 to 5 fresh generated hooks from the angle generator, not just competitor-derived themes.",
     "Measure winners at the use-case and term level, not just campaign level."
   ];
 
@@ -1128,6 +1308,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     keyword_clusters,
     underutilized_keywords,
     whitespace_use_cases,
+    angle_generator,
     creative_angles,
     channel_recommendations,
     test_hypotheses,
