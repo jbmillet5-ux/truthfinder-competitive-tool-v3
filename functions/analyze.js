@@ -75,6 +75,40 @@ const SCORE_WEIGHTS = {
   testability: 0.09
 };
 
+const FCRA_BLOCKLIST_PATTERNS = [
+  /\bemployment\b/i,
+  /\bemployer\b/i,
+  /\bjob applicant\b/i,
+  /\bpre[- ]employment\b/i,
+  /\bhiring\b/i,
+  /\brecruiter\b/i,
+  /\btenant\b/i,
+  /\btenant screening\b/i,
+  /\brental\b/i,
+  /\blease approval\b/i,
+  /\blandlord\b/i,
+  /\bhousing\b/i,
+  /\bcredit\b/i,
+  /\blending\b/i,
+  /\bloan approval\b/i,
+  /\binsurance\b/i,
+  /\bunderwriting\b/i,
+  /\beligibility\b/i,
+  /\bapprove\b/i,
+  /\bapproved\b/i,
+  /\bapproval\b/i,
+  /\bdeny\b/i,
+  /\bdenial\b/i,
+  /\bqualification\b/i,
+  /\badverse action\b/i,
+  /\bconsumer report\b/i,
+  /\bFCRA\b/i,
+  /\bscreen applicant\b/i,
+  /\bscreening report\b/i,
+  /\bemployment decision\b/i,
+  /\bhousing decision\b/i
+];
+
 const KEYWORD_CLUSTERS = [
   {
     cluster: "people search",
@@ -275,11 +309,11 @@ const WHITE_SPACE_USE_CASES = [
     why_fund: "Family-protection angles are emotionally strong and can convert higher-intent users."
   },
   {
-    use_case: "Check a new roommate, tenant, or subletter before you commit",
-    suggested_angle: "Know more before you share a home.",
+    use_case: "Check someone before you meet, transact, or trust them in daily life",
+    suggested_angle: "Know more before you say yes.",
     channels: ["google_ads", "meta_ads", "display"],
-    why_it_is_white_space: "The category rarely narrows messaging to everyday trust decisions like roommates and sublets.",
-    why_fund: "Specific life-event angles can outperform broad generic lookup messaging."
+    why_it_is_white_space: "The category rarely broadens into everyday trust decisions outside the usual lookup framing.",
+    why_fund: "Specific decision moments can outperform broad generic messaging."
   },
   {
     use_case: "Marketplace safety before meeting a buyer or seller",
@@ -296,7 +330,7 @@ const WHITE_SPACE_USE_CASES = [
     why_fund: "This expands category demand and bridges directly into privacy competitor territory."
   },
   {
-    use_case: "Contractor or in-home worker trust check",
+    use_case: "Contractor or in-home worker trust check for your own peace of mind",
     suggested_angle: "Before they enter your home, know a little more.",
     channels: ["google_ads", "meta_ads", "display"],
     why_it_is_white_space: "Homeowner trust is not a common direct-response angle in the category.",
@@ -320,7 +354,7 @@ const ANGLE_GENERATOR_LIBRARY = [
     customer_problem: "Couples planning weddings and major events often do not have up-to-date mailing addresses for extended friends and family.",
     why_truthfinder_can_help: "Public-record data can help locate or validate mailing and household information before sending expensive invitations.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Seasonal search campaign + event-planning LP",
+    test_format: "Seasonal search campaign + event-planning landing page",
     why_test_this: "This reframes the product as a planning utility, not just a lookup tool, and reaches a very different audience."
   },
   {
@@ -347,35 +381,17 @@ const ANGLE_GENERATOR_LIBRARY = [
     customer_problem: "Homeowners often hire contractors, handymen, or repair workers based on limited information.",
     why_truthfinder_can_help: "Public-record context can help create more confidence before allowing someone into the home or giving them access to family property.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Homeowner-focused LP + search intent test",
+    test_format: "Homeowner-focused landing page + search intent test",
     why_test_this: "Home trust is a major emotional driver and is not clearly owned by the category."
-  },
-  {
-    idea_name: "Nanny / Caregiver Trust Layer",
-    marketing_hook: "A little more confidence before they care for the people you love most.",
-    customer_problem: "Parents and families are deeply sensitive to uncertainty when hiring caregivers, babysitters, or elder helpers.",
-    why_truthfinder_can_help: "Public-record context can help families make more informed decisions before care begins.",
-    suggested_channels: ["meta_ads", "display"],
-    test_format: "Emotion-led social testing",
-    why_test_this: "This is a high-emotion, high-trust category with strong response potential."
-  },
-  {
-    idea_name: "Roommate / Tenant Confidence",
-    marketing_hook: "Know more before you share a home.",
-    customer_problem: "People choosing roommates, tenants, or subletters want more trust and less uncertainty.",
-    why_truthfinder_can_help: "Public-record context can help a user gather more real-world signals before agreeing to live with or rent to someone.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Use-case specific search and paid social",
-    why_test_this: "This is relatable, high-frequency, and much more specific than generic identity checking."
   },
   {
     idea_name: "Job Search Self-Audit",
     marketing_hook: "See what others could find about you before they do.",
-    customer_problem: "Job seekers worry about what hiring managers or others may find online or through public sources.",
+    customer_problem: "People applying for jobs may worry about what others can find about them online or through public sources.",
     why_truthfinder_can_help: "Public-record visibility can help users understand what may shape first impressions.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Self-audit LP + search/social test",
-    why_test_this: "This expands the product from searching others into self-awareness and reputation intelligence."
+    test_format: "Self-audit landing page + search/social test",
+    why_test_this: "This expands the product from searching others into self-awareness and reputation intelligence, while staying framed as a self-use case."
   },
   {
     idea_name: "Dating App Trust Layer",
@@ -410,7 +426,7 @@ const ANGLE_GENERATOR_LIBRARY = [
     customer_problem: "Rural and enthusiast buyers often buy animals, equipment, trailers, and vehicles from private sellers they do not know.",
     why_truthfinder_can_help: "Identity and location context can reduce risk before travel, deposits, or pickup arrangements.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Niche enthusiast LPs",
+    test_format: "Niche enthusiast landing pages",
     why_test_this: "This is a white-space trust problem with high financial stakes."
   },
   {
@@ -419,7 +435,7 @@ const ANGLE_GENERATOR_LIBRARY = [
     customer_problem: "People moving to a new neighborhood often feel blind about the people and context around them.",
     why_truthfinder_can_help: "Address, resident, and neighborhood context can reduce uncertainty before a move.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Moving / relocation LP",
+    test_format: "Moving / relocation landing page",
     why_test_this: "This is a life-event use case with high emotional weight and strong intent."
   },
   {
@@ -428,121 +444,268 @@ const ANGLE_GENERATOR_LIBRARY = [
     customer_problem: "People planning weddings, funerals, reunions, and milestone celebrations often lose contact info for important people.",
     why_truthfinder_can_help: "Public-record-based locating can help reconnect hosts and planners with the people they want to include.",
     suggested_channels: ["meta_ads", "google_ads"],
-    test_format: "Milestone-event LP and search campaigns",
+    test_format: "Milestone-event landing page and search campaigns",
     why_test_this: "This reaches a very different emotional use case and broadens the brand’s functional identity."
   }
 ];
 
-function timeoutPromise(ms) {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+function isFcraSensitiveText(value) {
+  const text = String(value || "");
+  return FCRA_BLOCKLIST_PATTERNS.some((pattern) => pattern.test(text));
+}
+
+function filterOutFcraSensitiveIdeas(items) {
+  return (items || []).filter((item) => {
+    const combined = [
+      item.idea_name,
+      item.marketing_hook,
+      item.customer_problem,
+      item.why_truthfinder_can_help,
+      item.test_format,
+      item.why_test_this,
+      item.use_case,
+      item.suggested_angle,
+      item.what_to_test,
+      item.hypothesis,
+      item.expected_outcome,
+      item.why_fund,
+      item.title
+    ].join(" ");
+    return !isFcraSensitiveText(combined);
   });
 }
 
-async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
-  return Promise.race([fetch(url, options), timeoutPromise(timeoutMs)]);
+function buildPortfolioCompetitors(payload) {
+  const incoming = Array.isArray(payload?.portfolio_competitors)
+    ? payload.portfolio_competitors
+    : DEFAULT_PORTFOLIO_COMPETITORS;
+
+  const cleaned = uniq(incoming.map(normalizeDomain).filter(Boolean));
+  return cleaned.length ? cleaned : [...DEFAULT_PORTFOLIO_COMPETITORS];
 }
 
-function normalizeInput(urlOrDomain) {
-  const raw = String(urlOrDomain || "").trim();
-  if (!raw) return "";
-  if (!raw.startsWith("http://") && !raw.startsWith("https://")) return `https://${raw}`;
-  return raw;
+function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
+  return portfolioCompetitors
+    .map((competitor) => {
+      const samePeoplePattern = competitor.includes("people") && domain.includes("people");
+
+      let similarity = 25;
+      similarity += Math.round((competition.overlap_score || 0) * 0.35);
+
+      if (samePeoplePattern) similarity += 12;
+      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
+        similarity += 10;
+      }
+      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
+        similarity += 8;
+      }
+      if (competitor === domain) similarity = 100;
+
+      similarity = Math.min(100, similarity);
+
+      let reason = "Moderate thematic overlap.";
+      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
+      else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
+      else reason = "More limited overlap versus the current portfolio assumptions.";
+
+      return {
+        competitor,
+        similarity_score: similarity,
+        reason
+      };
+    })
+    .sort((a, b) => b.similarity_score - a.similarity_score)
+    .slice(0, 12);
 }
 
-function normalizeDomain(value) {
-  let v = String(value || "").trim().toLowerCase();
-  v = v.replace(/^https?:\/\//, "");
-  v = v.replace(/^www\./, "");
-  v = v.split("/")[0];
-  return v;
+function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
+  return {
+    portfolio_competitors: portfolioCompetitors,
+    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
+    overlap_by_competitor: estimatePortfolioSimilarity(
+      domain,
+      portfolioCompetitors,
+      keywordClusters,
+      competition
+    )
+  };
 }
 
-function domainFromUrl(url) {
-  const parsed = new URL(url);
-  let host = parsed.hostname.toLowerCase();
-  if (host.startsWith("www.")) host = host.slice(4);
-  return host;
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
+  const ideas = [...ANGLE_GENERATOR_LIBRARY];
+
+  const topKeyword = keywordClusters[0];
+  if (topKeyword) {
+    ideas.push({
+      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
+      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
+      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
+      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
+      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
+      test_format: "Dedicated campaign + use-case landing page",
+      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
+    });
+  }
+
+  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
+  if (privacyAngle) {
+    ideas.push({
+      idea_name: "Public Record Footprint Awareness",
+      marketing_hook: "Know what your public footprint may be saying about you.",
+      customer_problem: "Users may not realize how much public-record context exists around them.",
+      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
+      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Awareness-driven landing page + social creative",
+      why_test_this: "This bridges classic people-search utility with privacy positioning."
+    });
+  }
+
+  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
+  if (safetyAngle) {
+    ideas.push({
+      idea_name: "Trust Before Transaction",
+      marketing_hook: "Before you say yes, know more.",
+      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
+      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
+      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Cross-use-case landing page + ad set family",
+      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
+    });
+  }
+
+  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
+    ideas.push({
+      idea_name: "Privacy-to-Lookup Bridge",
+      marketing_hook: "Not just privacy. Know what’s actually out there.",
+      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
+      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Bridge-message campaign",
+      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
+    });
+  }
+
+  for (const item of whitespaceUseCases.slice(0, 3)) {
+    ideas.push({
+      idea_name: `${item.use_case} Expansion`,
+      marketing_hook: item.suggested_angle,
+      customer_problem: item.use_case,
+      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
+      suggested_channels: item.channels || ["meta_ads"],
+      test_format: "Single-problem campaign test",
+      why_test_this: item.why_fund
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
 }
 
-function cleanText(str) {
-  return String(str || "")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
-    .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+async function analyzeSerps(domain, env) {
+  const apiKey = String(env.SERPAPI_KEY || "").trim();
+  const rows = [];
 
-function uniq(arr) {
-  return [...new Set((arr || []).filter(Boolean))];
-}
+  for (const query of [domain, ...COMMON_QUERY_SETS]) {
+    if (!apiKey) {
+      rows.push({
+        query,
+        source: "Not connected",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: "SERPAPI_KEY is not configured."
+      });
+      continue;
+    }
 
-function extractMetaByName(html, name) {
-  const regex1 = new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([\\s\\S]*?)["'][^>]*>`, "i");
-  const regex2 = new RegExp(`<meta[^>]+content=["']([\\s\\S]*?)["'][^>]+name=["']${name}["'][^>]*>`, "i");
-  return cleanText(html.match(regex1)?.[1] || html.match(regex2)?.[1] || "");
-}
-
-function extractAllMatches(html, regex, limit = 10) {
-  return [...html.matchAll(regex)].slice(0, limit).map((m) => cleanText(m[1])).filter(Boolean);
-}
-
-async function fetchHtml(url) {
-  const response = await fetchWithTimeout(url, {
-    headers: { "User-Agent": USER_AGENT },
-    redirect: "follow"
-  });
-
-  if (!response.ok) throw new Error(`Failed to fetch page: HTTP ${response.status}`);
-
-  const html = await response.text();
-  const finalUrl = response.url;
-
-  const title = cleanText(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
-  const meta_description = extractMetaByName(html, "description");
-  const h1 = cleanText(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "");
-  const h2s = extractAllMatches(html, /<h2[^>]*>([\s\S]*?)<\/h2>/gi, 8);
-  const h3s = extractAllMatches(html, /<h3[^>]*>([\s\S]*?)<\/h3>/gi, 8);
-  const button_texts = extractAllMatches(html, /<button[^>]*>([\s\S]*?)<\/button>/gi, 20);
-  const anchor_texts = extractAllMatches(html, /<a[^>]*>([\s\S]*?)<\/a>/gi, 30);
-  const body_text = cleanText(html).slice(0, 40000);
-
-  const links = [];
-  const pageUrl = new URL(finalUrl);
-
-  for (const match of html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi)) {
-    const href = String(match[1] || "").trim();
-    if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
     try {
-      const abs = new URL(href, finalUrl).toString();
-      if (new URL(abs).hostname === pageUrl.hostname && !links.includes(abs)) links.push(abs);
-    } catch {
-      // ignore malformed urls
+      const url = new URL("https://serpapi.com/search.json");
+      url.searchParams.set("engine", "google");
+      url.searchParams.set("q", query);
+      url.searchParams.set("api_key", apiKey);
+      url.searchParams.set("num", "10");
+
+      const resp = await fetchWithTimeout(url.toString(), {}, DEFAULT_TIMEOUT_MS);
+      if (!resp.ok) throw new Error(`SERP API failed: ${resp.status}`);
+
+      const payload = await resp.json();
+      const ads = payload.ads || [];
+      const organic = payload.organic_results || [];
+
+      rows.push({
+        query,
+        source: "SerpAPI",
+        ads_count: ads.length,
+        top_organic_titles: organic.slice(0, 3).map((o) => o.title || ""),
+        notes:
+          ads.length > 0
+            ? `Detected ${ads.length} paid placements in returned snapshot.`
+            : "No paid placements detected in returned snapshot."
+      });
+    } catch (err) {
+      rows.push({
+        query,
+        source: "Unavailable",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: `SERP lookup failed: ${err.message}`
+      });
     }
   }
 
-  return {
-    final_url: finalUrl,
-    title,
-    meta_description,
-    h1,
-    h2s,
-    h3s,
-    button_texts: uniq(button_texts),
-    anchor_texts: uniq(anchor_texts),
-    links: links.slice(0, 40),
-    body_text,
-    status_code: response.status
-  };
+  return rows;
+}
+
+async function maybeCreativeFeed(domain, env) {
+  const base = String(env.AD_CREATIVE_API_BASE || "").trim();
+  if (!base) {
+    return {
+      creative_summary: "No ad creative feed configured.",
+      ad_creatives: []
+    };
+  }
+
+  try {
+    const url = new URL("/creatives", base);
+    url.searchParams.set("domain", domain);
+
+    const resp = await fetchWithTimeout(url.toString(), {}, 25000);
+    if (!resp.ok) throw new Error(`Creative feed failed: ${resp.status}`);
+
+    const payload = await resp.json();
+    return {
+      creative_summary:
+        payload.creative_summary ||
+        `Creative feed returned ${Array.isArray(payload.ad_creatives) ? payload.ad_creatives.length : 0} creatives.`,
+      ad_creatives: Array.isArray(payload.ad_creatives) ? payload.ad_creatives.slice(0, 10) : []
+    };
+  } catch (err) {
+    return {
+      creative_summary: `Creative feed configured but request failed: ${err.message}`,
+      ad_creatives: []
+    };
+  }
+}
+
+function buildDataSources(scrape, serps, adCreatives) {
+  const serpConnected = serps.some((s) => s.source === "SerpAPI");
+  const creativesConnected = (adCreatives || []).length > 0;
+
+  return [
+    {
+      name: "Homepage Crawl",
+      status: "Connected",
+      detail: `Fetched ${scrape.final_url} and parsed visible content.`
+    },
+    {
+      name: "SERP Data",
+      status: serpConnected ? "Connected" : "Not connected",
+      detail: serpConnected ? "Live SERP snapshots returned." : "No live SERP source returned."
+    },
+    {
+      name: "Ad Creatives",
+      status: creativesConnected ? "Connected" : "Not connected",
+      detail: creativesConnected ? `${adCreatives.length} creative assets returned.` : "No live creative source returned."
+    }
+  ];
 }
 
 function countMatches(text, terms) {
@@ -607,32 +770,34 @@ function getClusterPresence(fullText, scrape) {
 }
 
 function buildKeywordClusters(clusterPresence, benchmarkLabel) {
-  return clusterPresence.map((c) => {
-    let opportunity = 55;
-    if (!c.detected) opportunity += 25;
-    else if (c.visibility_score < 30) opportunity += 15;
-    if (c.intent_type === "adjacent") opportunity += 8;
-    if (c.intent_type === "expansion") opportunity += 12;
-    if (c.intent_type === "privacy_adjacent") opportunity += 15;
-    if (c.priority === "high") opportunity += 5;
-    opportunity = Math.min(100, opportunity);
+  return clusterPresence
+    .map((c) => {
+      let opportunity = 55;
+      if (!c.detected) opportunity += 25;
+      else if (c.visibility_score < 30) opportunity += 15;
+      if (c.intent_type === "adjacent") opportunity += 8;
+      if (c.intent_type === "expansion") opportunity += 12;
+      if (c.intent_type === "privacy_adjacent") opportunity += 15;
+      if (c.priority === "high") opportunity += 5;
+      opportunity = Math.min(100, opportunity);
 
-    return {
-      cluster: c.cluster,
-      intent_type: c.intent_type,
-      priority: c.priority,
-      competitor_visibility_score: c.visibility_score,
-      detected_on_competitor: c.detected,
-      opportunity_score: opportunity,
-      opportunity_level: classifyBand(opportunity),
-      representative_keywords: c.keywords.slice(0, 6),
-      recommended_channels: c.channels,
-      volume_tier: c.volume_tier,
-      why_it_matters: c.detected
-        ? `${c.cluster} appears present on the analyzed brand and likely maps to monetizable demand.`
-        : `${c.cluster} looks underrepresented, which may create white-space opportunity versus ${benchmarkLabel}.`
-    };
-  }).sort((a, b) => b.opportunity_score - a.opportunity_score);
+      return {
+        cluster: c.cluster,
+        intent_type: c.intent_type,
+        priority: c.priority,
+        competitor_visibility_score: c.visibility_score,
+        detected_on_competitor: c.detected,
+        opportunity_score: opportunity,
+        opportunity_level: classifyBand(opportunity),
+        representative_keywords: c.keywords.slice(0, 6),
+        recommended_channels: c.channels,
+        volume_tier: c.volume_tier,
+        why_it_matters: c.detected
+          ? `${c.cluster} appears present on the analyzed brand and likely maps to monetizable demand.`
+          : `${c.cluster} looks underrepresented, which may create white-space opportunity versus ${benchmarkLabel}.`
+      };
+    })
+    .sort((a, b) => b.opportunity_score - a.opportunity_score);
 }
 
 function buildUnderutilizedKeywords(clusterPresence, benchmarkLabel) {
@@ -646,7 +811,8 @@ function buildUnderutilizedKeywords(clusterPresence, benchmarkLabel) {
         keyword,
         cluster: c.cluster,
         priority: c.priority,
-        opportunity_level: c.intent_type === "privacy_adjacent" || c.intent_type === "expansion" ? "Medium-High" : "High",
+        opportunity_level:
+          c.intent_type === "privacy_adjacent" || c.intent_type === "expansion" ? "Medium-High" : "High",
         recommended_channel: c.channels[0] || "google_ads",
         why: !c.detected
           ? `This appears missing from the analyzed brand’s emphasis, giving room to test ownership versus ${benchmarkLabel}.`
@@ -704,7 +870,10 @@ function scoreModel(clusterPresence, detectedAngles, scrape) {
   const monetizationLinks = (scrape.links || []).filter((u) => /pricing|plans|trial|checkout|subscribe|membership/i.test(u)).length;
   const multiChannelSignals = clusterPresence.filter((c) => c.channels.length >= 3).length;
 
-  const keyword_opportunity_score = Math.min(100, 45 + clusterPresence.filter((c) => !c.detected || c.visibility_score < 25).length * 6);
+  const keyword_opportunity_score = Math.min(
+    100,
+    45 + clusterPresence.filter((c) => !c.detected || c.visibility_score < 25).length * 6
+  );
   const paid_intent_coverage_score = Math.min(100, coreDetected * 22 + Math.min(12, allDetected * 2));
   const creative_angle_diversity_score = Math.min(100, 30 + angleDetected * 12);
   const use_case_expansion_score = Math.min(100, 35 + expansionDetected * 12 + privacyDetected * 10);
@@ -832,7 +1001,7 @@ function buildTestHypotheses(whitespaceUseCases, creativeAngles) {
     });
   }
 
-  return rows.slice(0, 8);
+  return filterOutFcraSensitiveIdeas(rows).slice(0, 8);
 }
 
 function buildPriorityTests(keywordClusters, whitespaceUseCases, underutilizedKeywords, detectedAngles) {
@@ -843,7 +1012,7 @@ function buildPriorityTests(keywordClusters, whitespaceUseCases, underutilizedKe
     tests.push({
       test_name: `Launch search cluster: ${topCluster.cluster}`,
       channel: topCluster.recommended_channels[0] || "google_ads",
-      what_to_test: `Build a dedicated campaign and LP around ${topCluster.cluster}.`,
+      what_to_test: `Build a dedicated campaign and landing page around ${topCluster.cluster}.`,
       hypothesis: `${topCluster.cluster} represents demand that can be captured with stronger specificity and better positioning.`,
       expected_outcome: "Incremental qualified clicks and conversions.",
       why_fund: topCluster.why_it_matters
@@ -886,7 +1055,7 @@ function buildPriorityTests(keywordClusters, whitespaceUseCases, underutilizedKe
     });
   }
 
-  return tests.slice(0, 6);
+  return filterOutFcraSensitiveIdeas(tests).slice(0, 6);
 }
 
 function buildOpportunityModel(priorityTests, assumptions) {
@@ -941,7 +1110,7 @@ function classifyCompetition(fullText, clusterPresence, detectedAngles) {
 
   const audience_overlap = Math.min(
     100,
-    detectedAngles.filter(a =>
+    detectedAngles.filter((a) =>
       ["Safety / protect myself", "Identity / scam / fraud concern", "Privacy / control my data"].includes(a.angle)
     ).length * 28
   );
@@ -975,20 +1144,22 @@ function classifyCompetition(fullText, clusterPresence, detectedAngles) {
     why_they_compete: direct
       ? "They compete directly on similar high-intent keyword themes and monetize closely related intent."
       : "They compete by solving adjacent or upstream versions of the same user problems.",
-    how_they_steal_budget: keyword_overlap > 50
-      ? "They likely show up in overlapping auctions, raising CPC and absorbing high-intent traffic."
-      : "They may intercept users earlier with privacy, protection, or trust framing before users search directly for portfolio-style solutions.",
-    recommended_response: keyword_overlap > 50
-      ? "Defend shared keywords and improve landing-page specificity and conversion."
-      : "Expand messaging into their angle and capture upstream demand before it gets framed away from the portfolio."
+    how_they_steal_budget:
+      keyword_overlap > 50
+        ? "They likely show up in overlapping auctions, raising CPC and absorbing high-intent traffic."
+        : "They may intercept users earlier with privacy, protection, or trust framing before users search directly for portfolio-style solutions.",
+    recommended_response:
+      keyword_overlap > 50
+        ? "Defend shared keywords and improve landing-page specificity and conversion."
+        : "Expand messaging into their angle and capture upstream demand before it gets framed away from the portfolio."
   };
 }
 
 function buildAuctionOverlapEstimator(keywordClusters, competition) {
   const top_overlap_keywords = keywordClusters
-    .filter(k => ["core", "privacy_adjacent", "adjacent"].includes(k.intent_type))
+    .filter((k) => ["core", "privacy_adjacent", "adjacent"].includes(k.intent_type))
     .slice(0, 6)
-    .map(k => ({
+    .map((k) => ({
       keyword: k.representative_keywords[0] || k.cluster,
       volume_tier: k.volume_tier || "Medium",
       reason: k.detected_on_competitor
@@ -1013,9 +1184,9 @@ function buildAuctionOverlapEstimator(keywordClusters, competition) {
 }
 
 function buildSearchTermAlignment(searchTerms, keywordClusters) {
-  const normalized = (searchTerms || []).map(x => String(x || "").trim()).filter(Boolean);
+  const normalized = (searchTerms || []).map((x) => String(x || "").trim()).filter(Boolean);
 
-  const matches = normalized.map(term => {
+  const matches = normalized.map((term) => {
     const lower = term.toLowerCase();
 
     let bestCluster = null;
@@ -1040,7 +1211,7 @@ function buildSearchTermAlignment(searchTerms, keywordClusters) {
     };
   });
 
-  const alignedCount = matches.filter(m => m.matched_cluster !== "No strong match").length;
+  const alignedCount = matches.filter((m) => m.matched_cluster !== "No strong match").length;
   const alignment_score = normalized.length
     ? Math.round((alignedCount / normalized.length) * 100)
     : 0;
@@ -1073,7 +1244,7 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
     });
   }
 
-  const privacyCluster = keywordClusters.find(k => k.intent_type === "privacy_adjacent");
+  const privacyCluster = keywordClusters.find((k) => k.intent_type === "privacy_adjacent");
   if (privacyCluster) {
     plays.push({
       play_name: "Bridge lookup intent with privacy concern",
@@ -1084,7 +1255,7 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
     });
   }
 
-  const safetyAngle = creativeAngles.find(a => a.angle === "Safety / protect myself");
+  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
   if (safetyAngle) {
     plays.push({
       play_name: "Win on emotional specificity",
@@ -1105,237 +1276,7 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
     });
   }
 
-  return plays.slice(0, 6);
-}
-
-function buildPortfolioCompetitors(payload) {
-  const incoming = Array.isArray(payload?.portfolio_competitors)
-    ? payload.portfolio_competitors
-    : DEFAULT_PORTFOLIO_COMPETITORS;
-
-  const cleaned = uniq(incoming.map(normalizeDomain).filter(Boolean));
-  return cleaned.length ? cleaned : [...DEFAULT_PORTFOLIO_COMPETITORS];
-}
-
-function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
-  return portfolioCompetitors.map((competitor) => {
-    const samePeoplePattern =
-      competitor.includes("people") && domain.includes("people");
-
-    let similarity = 25;
-    similarity += Math.round((competition.overlap_score || 0) * 0.35);
-
-    if (samePeoplePattern) similarity += 12;
-    if (competitor.includes("cloaked") && keywordClusters.some(k => k.intent_type === "privacy_adjacent")) {
-      similarity += 10;
-    }
-    if (competitor.includes("whitepages") && keywordClusters.some(k => k.cluster === "people search")) {
-      similarity += 8;
-    }
-    if (competitor === domain) similarity = 100;
-
-    similarity = Math.min(100, similarity);
-
-    let reason = "Moderate thematic overlap.";
-    if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
-    else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
-    else reason = "More limited overlap versus the current portfolio assumptions.";
-
-    return {
-      competitor,
-      similarity_score: similarity,
-      reason
-    };
-  }).sort((a, b) => b.similarity_score - a.similarity_score).slice(0, 12);
-}
-
-function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
-  return {
-    portfolio_competitors: portfolioCompetitors,
-    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
-    overlap_by_competitor: estimatePortfolioSimilarity(
-      domain,
-      portfolioCompetitors,
-      keywordClusters,
-      competition
-    )
-  };
-}
-
-function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
-  const ideas = [...ANGLE_GENERATOR_LIBRARY];
-
-  const topKeyword = keywordClusters[0];
-  if (topKeyword) {
-    ideas.push({
-      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
-      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
-      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
-      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
-      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
-      test_format: "Dedicated campaign + use-case LP",
-      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
-    });
-  }
-
-  const privacyAngle = creativeAngles.find(a => a.angle === "Privacy / control my data");
-  if (privacyAngle) {
-    ideas.push({
-      idea_name: "Public Record Footprint Awareness",
-      marketing_hook: "Know what your public footprint may be saying about you.",
-      customer_problem: "Users may not realize how much public-record context exists around them.",
-      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
-      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Awareness-driven landing page + social creative",
-      why_test_this: "This bridges classic people-search utility with privacy positioning."
-    });
-  }
-
-  const safetyAngle = creativeAngles.find(a => a.angle === "Safety / protect myself");
-  if (safetyAngle) {
-    ideas.push({
-      idea_name: "Trust Before Transaction",
-      marketing_hook: "Before you say yes, know more.",
-      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and rentals with limited context.",
-      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
-      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Cross-use-case landing page + ad set family",
-      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
-    });
-  }
-
-  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
-    ideas.push({
-      idea_name: "Privacy-to-Lookup Bridge",
-      marketing_hook: "Not just privacy. Know what’s actually out there.",
-      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
-      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
-      suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Bridge-message campaign",
-      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
-    });
-  }
-
-  for (const item of whitespaceUseCases.slice(0, 3)) {
-    ideas.push({
-      idea_name: `${item.use_case} Expansion`,
-      marketing_hook: item.suggested_angle,
-      customer_problem: item.use_case,
-      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
-      suggested_channels: item.channels || ["meta_ads"],
-      test_format: "Single-problem campaign test",
-      why_test_this: item.why_fund
-    });
-  }
-
-  return ideas.slice(0, 20);
-}
-
-async function analyzeSerps(domain, env) {
-  const apiKey = String(env.SERPAPI_KEY || "").trim();
-  const rows = [];
-
-  for (const query of [domain, ...COMMON_QUERY_SETS]) {
-    if (!apiKey) {
-      rows.push({
-        query,
-        source: "Not connected",
-        ads_count: null,
-        top_organic_titles: [],
-        notes: "SERPAPI_KEY is not configured."
-      });
-      continue;
-    }
-
-    try {
-      const url = new URL("https://serpapi.com/search.json");
-      url.searchParams.set("engine", "google");
-      url.searchParams.set("q", query);
-      url.searchParams.set("api_key", apiKey);
-      url.searchParams.set("num", "10");
-
-      const resp = await fetchWithTimeout(url.toString(), {}, DEFAULT_TIMEOUT_MS);
-      if (!resp.ok) throw new Error(`SERP API failed: ${resp.status}`);
-
-      const payload = await resp.json();
-      const ads = payload.ads || [];
-      const organic = payload.organic_results || [];
-
-      rows.push({
-        query,
-        source: "SerpAPI",
-        ads_count: ads.length,
-        top_organic_titles: organic.slice(0, 3).map((o) => o.title || ""),
-        notes: ads.length > 0
-          ? `Detected ${ads.length} paid placements in returned snapshot.`
-          : "No paid placements detected in returned snapshot."
-      });
-    } catch (err) {
-      rows.push({
-        query,
-        source: "Unavailable",
-        ads_count: null,
-        top_organic_titles: [],
-        notes: `SERP lookup failed: ${err.message}`
-      });
-    }
-  }
-
-  return rows;
-}
-
-async function maybeCreativeFeed(domain, env) {
-  const base = String(env.AD_CREATIVE_API_BASE || "").trim();
-  if (!base) {
-    return {
-      creative_summary: "No ad creative feed configured.",
-      ad_creatives: []
-    };
-  }
-
-  try {
-    const url = new URL("/creatives", base);
-    url.searchParams.set("domain", domain);
-
-    const resp = await fetchWithTimeout(url.toString(), {}, 25000);
-    if (!resp.ok) throw new Error(`Creative feed failed: ${resp.status}`);
-
-    const payload = await resp.json();
-    return {
-      creative_summary:
-        payload.creative_summary ||
-        `Creative feed returned ${Array.isArray(payload.ad_creatives) ? payload.ad_creatives.length : 0} creatives.`,
-      ad_creatives: Array.isArray(payload.ad_creatives) ? payload.ad_creatives.slice(0, 10) : []
-    };
-  } catch (err) {
-    return {
-      creative_summary: `Creative feed configured but request failed: ${err.message}`,
-      ad_creatives: []
-    };
-  }
-}
-
-function buildDataSources(scrape, serps, adCreatives) {
-  const serpConnected = serps.some((s) => s.source === "SerpAPI");
-  const creativesConnected = (adCreatives || []).length > 0;
-
-  return [
-    {
-      name: "Homepage Crawl",
-      status: "Connected",
-      detail: `Fetched ${scrape.final_url} and parsed visible content.`
-    },
-    {
-      name: "SERP Data",
-      status: serpConnected ? "Connected" : "Not connected",
-      detail: serpConnected ? "Live SERP snapshots returned." : "No live SERP source returned."
-    },
-    {
-      name: "Ad Creatives",
-      status: creativesConnected ? "Connected" : "Not connected",
-      detail: creativesConnected ? `${adCreatives.length} creative assets returned.` : "No live creative source returned."
-    }
-  ];
+  return filterOutFcraSensitiveIdeas(plays).slice(0, 6);
 }
 
 function buildSummary(domain, scores, keywordClusters, detectedAngles) {
@@ -1364,7 +1305,10 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
   const scrape = await fetchHtml(url);
   const domain = domainFromUrl(scrape.final_url);
-  const competitorName = domain.replace(".com", "").replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const competitorName = domain
+    .replace(".com", "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
   const fullText = getFullText(scrape).toLowerCase();
   const clusterPresence = getClusterPresence(fullText, scrape);
@@ -1372,7 +1316,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const underutilized_keywords = buildUnderutilizedKeywords(clusterPresence, "the portfolio");
   const detectedAngles = detectCreativeAngles(fullText, scrape);
   const creative_angles = detectedAngles.slice(0, 8);
-  const whitespace_use_cases = buildWhitespaceUseCases();
+  const whitespace_use_cases = filterOutFcraSensitiveIdeas(buildWhitespaceUseCases());
   const scores = scoreModel(clusterPresence, detectedAngles, scrape);
 
   const competition_classification = classifyCompetition(fullText, clusterPresence, detectedAngles);
@@ -1497,6 +1441,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
       `Benchmark assumptions: CTR=${assumptions.benchmark_ctr_pct}%, CVR=${assumptions.benchmark_cvr_pct}%, CPC=$${assumptions.benchmark_cpc}, monthly_impr=${assumptions.benchmark_monthly_impressions}`,
       searchTerms.length ? `Search terms supplied: ${searchTerms.length}` : "No search terms supplied.",
       analystQuestions ? `Analyst focus questions: ${analystQuestions}` : "No custom analyst questions supplied.",
+      "FCRA-sensitive ideas and eligibility-style use cases were filtered out of generated outputs.",
       "No persistent storage is used; each analysis is generated fresh per request."
     ]
   };
