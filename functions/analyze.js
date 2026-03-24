@@ -1299,6 +1299,232 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
   return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
 }
 
+async function analyzeSerps(domain, env) {
+  const apiKey = String(env.SERPAPI_KEY || "").trim();
+  const results = [];
+
+  for (const query of [domain, ...COMMON_QUERY_SETS]) {
+    if (!apiKey) {
+      results.push({
+        query,
+        source: "Not connected",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: "SERPAPI_KEY is not configured."
+      });
+      continue;
+    }
+
+    try {
+      const url = new URL("https://serpapi.com/search.json");
+      url.searchParams.set("engine", "google");
+      url.searchParams.set("q", query);
+      url.searchParams.set("api_key", apiKey);
+      url.searchParams.set("num", "10");
+
+      const resp = await fetchWithTimeout(url.toString(), {}, DEFAULT_TIMEOUT_MS);
+      if (!resp.ok) throw new Error(`SERP API failed: ${resp.status}`);
+
+      const payload = await resp.json();
+      const ads = payload.ads || [];
+      const organic = payload.organic_results || [];
+
+      results.push({
+        query,
+        source: "SerpAPI",
+        ads_count: ads.length,
+        top_organic_titles: organic.slice(0, 3).map((o) => o.title || ""),
+        notes:
+          ads.length > 0
+            ? `Detected ${ads.length} paid placements in returned snapshot.`
+            : "No paid placements detected in returned snapshot."
+      });
+    } catch (err) {
+      results.push({
+        query,
+        source: "Unavailable",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: `SERP lookup failed: ${err.message}`
+      });
+    }
+  }
+
+  return results;
+}
+
+async function maybeCreativeFeed(domain, env) {
+  const base = String(env.AD_CREATIVE_API_BASE || "").trim();
+
+  if (!base) {
+    return {
+      creative_summary: "No creative feed configured.",
+      ad_creatives: []
+    };
+  }
+
+  try {
+    const url = new URL("/creatives", base);
+    url.searchParams.set("domain", domain);
+
+    const resp = await fetchWithTimeout(url.toString(), {}, 20000);
+    if (!resp.ok) throw new Error(`Creative feed failed: ${resp.status}`);
+
+    const payload = await resp.json();
+
+    return {
+      creative_summary:
+        payload.creative_summary ||
+        `Returned ${Array.isArray(payload.ad_creatives) ? payload.ad_creatives.length : 0} creatives`,
+      ad_creatives: Array.isArray(payload.ad_creatives) ? payload.ad_creatives.slice(0, 10) : []
+    };
+  } catch (err) {
+    return {
+      creative_summary: `Creative feed failed: ${err.message}`,
+      ad_creatives: []
+    };
+  }
+}
+
+function buildDataSources(scrape, serps, adCreatives) {
+  const serpConnected = serps.some((s) => s.source === "SerpAPI");
+  const creativesConnected = (adCreatives || []).length > 0;
+
+  return [
+    {
+      name: "Homepage Crawl",
+      status: "Connected",
+      detail: `Parsed ${scrape.final_url}`
+    },
+    {
+      name: "SERP Data",
+      status: serpConnected ? "Connected" : "Not connected",
+      detail: serpConnected ? "Live SERP data available" : "No SERP connection"
+    },
+    {
+      name: "Ad Creatives",
+      status: creativesConnected ? "Connected" : "Not connected",
+      detail: creativesConnected ? `${adCreatives.length} creatives returned` : "No creative data"
+    }
+  ];
+}
+
+function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
+  return portfolioCompetitors
+    .map((competitor) => {
+      const samePeoplePattern = competitor.includes("people") && domain.includes("people");
+
+      let similarity = 25;
+      similarity += Math.round((competition.overlap_score || 0) * 0.35);
+
+      if (samePeoplePattern) similarity += 12;
+      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
+        similarity += 10;
+      }
+      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
+        similarity += 8;
+      }
+      if (competitor === domain) similarity = 100;
+
+      similarity = Math.min(100, similarity);
+
+      let reason = "Moderate thematic overlap.";
+      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
+      else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
+      else reason = "More limited overlap versus the current portfolio assumptions.";
+
+      return {
+        competitor,
+        similarity_score: similarity,
+        reason
+      };
+    })
+    .sort((a, b) => b.similarity_score - a.similarity_score)
+    .slice(0, 12);
+}
+
+function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
+  return {
+    portfolio_competitors: portfolioCompetitors,
+    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
+    overlap_by_competitor: estimatePortfolioSimilarity(
+      domain,
+      portfolioCompetitors,
+      keywordClusters,
+      competition
+    )
+  };
+}
+
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
+  const ideas = [...ANGLE_GENERATOR_LIBRARY];
+
+  const topKeyword = keywordClusters[0];
+  if (topKeyword) {
+    ideas.push({
+      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
+      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
+      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
+      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
+      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
+      test_format: "Dedicated campaign + use-case landing page",
+      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
+    });
+  }
+
+  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
+  if (privacyAngle) {
+    ideas.push({
+      idea_name: "Public Record Footprint Awareness",
+      marketing_hook: "Know what your public footprint may be saying about you.",
+      customer_problem: "Users may not realize how much public-record context exists around them.",
+      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
+      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Awareness-driven landing page + social creative",
+      why_test_this: "This bridges classic people-search utility with privacy positioning."
+    });
+  }
+
+  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
+  if (safetyAngle) {
+    ideas.push({
+      idea_name: "Trust Before Transaction",
+      marketing_hook: "Before you say yes, know more.",
+      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
+      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
+      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Cross-use-case landing page + ad set family",
+      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
+    });
+  }
+
+  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
+    ideas.push({
+      idea_name: "Privacy-to-Lookup Bridge",
+      marketing_hook: "Not just privacy. Know what’s actually out there.",
+      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
+      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Bridge-message campaign",
+      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
+    });
+  }
+
+  for (const item of whitespaceUseCases.slice(0, 3)) {
+    ideas.push({
+      idea_name: `${item.use_case} Expansion`,
+      marketing_hook: item.suggested_angle,
+      customer_problem: item.use_case,
+      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
+      suggested_channels: item.channels || ["meta_ads"],
+      test_format: "Single-problem campaign test",
+      why_test_this: item.why_fund
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
+}
+
 function buildSummary(domain, scores, keywordClusters, detectedAngles) {
   const topClusters = keywordClusters.slice(0, 3).map((k) => k.cluster);
   const topAngles = detectedAngles.filter((a) => a.detected).slice(0, 2).map((a) => a.angle);
