@@ -1304,6 +1304,117 @@ function buildSummary(domain, scores, keywordClusters, detectedAngles) {
   return `${domain} shows ${scores.pressure_band.toLowerCase()} competitive pressure with the biggest opportunities centered on ${topClusters.join(", ") || "core lookup intent"}. The most visible creative angles are ${topAngles.join(", ").toLowerCase() || "not strongly differentiated"}, creating room to compete on sharper segmentation, privacy-adjacent positioning, and new outside-the-box use-case messaging.`;
 }
 
+async function analyzeSerps(domain, env) {
+  const apiKey = String(env.SERPAPI_KEY || "").trim();
+  const results = [];
+
+  for (const query of [domain, ...COMMON_QUERY_SETS]) {
+    if (!apiKey) {
+      results.push({
+        query,
+        source: "Not connected",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: "SERPAPI_KEY is not configured."
+      });
+      continue;
+    }
+
+    try {
+      const url = new URL("https://serpapi.com/search.json");
+      url.searchParams.set("engine", "google");
+      url.searchParams.set("q", query);
+      url.searchParams.set("api_key", apiKey);
+      url.searchParams.set("num", "10");
+
+      const resp = await fetchWithTimeout(url.toString());
+      if (!resp.ok) throw new Error(`SERP API failed: ${resp.status}`);
+
+      const payload = await resp.json();
+
+      results.push({
+        query,
+        source: "SerpAPI",
+        ads_count: (payload.ads || []).length,
+        top_organic_titles: (payload.organic_results || [])
+          .slice(0, 3)
+          .map((o) => o.title || ""),
+        notes: "Live SERP snapshot"
+      });
+
+    } catch (err) {
+      results.push({
+        query,
+        source: "Unavailable",
+        ads_count: null,
+        top_organic_titles: [],
+        notes: `SERP lookup failed: ${err.message}`
+      });
+    }
+  }
+
+  return results;
+}
+
+async function maybeCreativeFeed(domain, env) {
+  const base = String(env.AD_CREATIVE_API_BASE || "").trim();
+
+  if (!base) {
+    return {
+      creative_summary: "No creative feed configured.",
+      ad_creatives: []
+    };
+  }
+
+  try {
+    const url = new URL("/creatives", base);
+    url.searchParams.set("domain", domain);
+
+    const resp = await fetchWithTimeout(url.toString(), {}, 20000);
+    if (!resp.ok) throw new Error(`Creative feed failed: ${resp.status}`);
+
+    const payload = await resp.json();
+
+    return {
+      creative_summary:
+        payload.creative_summary ||
+        `Returned ${payload.ad_creatives?.length || 0} creatives`,
+      ad_creatives: payload.ad_creatives || []
+    };
+
+  } catch (err) {
+    return {
+      creative_summary: `Creative feed failed: ${err.message}`,
+      ad_creatives: []
+    };
+  }
+}
+
+function buildDataSources(scrape, serps, adCreatives) {
+  const serpConnected = serps.some((s) => s.source === "SerpAPI");
+  const creativesConnected = (adCreatives || []).length > 0;
+
+  return [
+    {
+      name: "Homepage Crawl",
+      status: "Connected",
+      detail: `Parsed ${scrape.final_url}`
+    },
+    {
+      name: "SERP Data",
+      status: serpConnected ? "Connected" : "Not connected",
+      detail: serpConnected ? "Live SERP data available" : "No SERP connection"
+    },
+    {
+      name: "Ad Creatives",
+      status: creativesConnected ? "Connected" : "Not connected",
+      detail: creativesConnected
+        ? `${adCreatives.length} creatives returned`
+        : "No creative data"
+    }
+  ];
+}
+
 async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const market = String(payload.market || "people_search");
   const device = String(payload.device || "mobile");
