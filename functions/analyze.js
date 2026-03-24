@@ -64,7 +64,7 @@ const PORTFOLIO_IDENTITY = {
 };
 
 const SCORE_WEIGHTS = {
-  keyword_opportunity: 0.20,
+  keyword_opportunity: 0.2,
   paid_intent_coverage: 0.16,
   creative_diversity: 0.12,
   use_case_expansion: 0.15,
@@ -449,6 +449,133 @@ const ANGLE_GENERATOR_LIBRARY = [
   }
 ];
 
+function timeoutPromise(ms) {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+  });
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
+  return Promise.race([fetch(url, options), timeoutPromise(timeoutMs)]);
+}
+
+function normalizeInput(urlOrDomain) {
+  const raw = String(urlOrDomain || "").trim();
+  if (!raw) return "";
+  if (!raw.startsWith("http://") && !raw.startsWith("https://")) return `https://${raw}`;
+  return raw;
+}
+
+function normalizeDomain(value) {
+  let v = String(value || "").trim().toLowerCase();
+  v = v.replace(/^https?:\/\//, "");
+  v = v.replace(/^www\./, "");
+  v = v.split("/")[0];
+  return v;
+}
+
+function domainFromUrl(url) {
+  const parsed = new URL(url);
+  let host = parsed.hostname.toLowerCase();
+  if (host.startsWith("www.")) host = host.slice(4);
+  return host;
+}
+
+function cleanText(str) {
+  return String(str || "")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
+    .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function uniq(arr) {
+  return [...new Set((arr || []).filter(Boolean))];
+}
+
+function extractMetaByName(html, name) {
+  const regex1 = new RegExp(
+    `<meta[^>]+name=["']${name}["'][^>]+content=["']([\\s\\S]*?)["'][^>]*>`,
+    "i"
+  );
+  const regex2 = new RegExp(
+    `<meta[^>]+content=["']([\\s\\S]*?)["'][^>]+name=["']${name}["'][^>]*>`,
+    "i"
+  );
+  return cleanText(html.match(regex1)?.[1] || html.match(regex2)?.[1] || "");
+}
+
+function extractAllMatches(html, regex, limit = 10) {
+  return [...html.matchAll(regex)]
+    .slice(0, limit)
+    .map((m) => cleanText(m[1]))
+    .filter(Boolean);
+}
+
+async function fetchHtml(url) {
+  const response = await fetchWithTimeout(url, {
+    headers: { "User-Agent": USER_AGENT },
+    redirect: "follow"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch page: HTTP ${response.status}`);
+  }
+
+  const html = await response.text();
+  const finalUrl = response.url;
+
+  const title = cleanText(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
+  const meta_description = extractMetaByName(html, "description");
+  const h1 = cleanText(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "");
+  const h2s = extractAllMatches(html, /<h2[^>]*>([\s\S]*?)<\/h2>/gi, 8);
+  const h3s = extractAllMatches(html, /<h3[^>]*>([\s\S]*?)<\/h3>/gi, 8);
+  const button_texts = extractAllMatches(html, /<button[^>]*>([\s\S]*?)<\/button>/gi, 20);
+  const anchor_texts = extractAllMatches(html, /<a[^>]*>([\s\S]*?)<\/a>/gi, 30);
+  const body_text = cleanText(html).slice(0, 40000);
+
+  const links = [];
+  const pageUrl = new URL(finalUrl);
+
+  for (const match of html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi)) {
+    const href = String(match[1] || "").trim();
+    if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) {
+      continue;
+    }
+    try {
+      const abs = new URL(href, finalUrl).toString();
+      if (new URL(abs).hostname === pageUrl.hostname && !links.includes(abs)) {
+        links.push(abs);
+      }
+    } catch {
+      // ignore malformed urls
+    }
+  }
+
+  return {
+    final_url: finalUrl,
+    title,
+    meta_description,
+    h1,
+    h2s,
+    h3s,
+    button_texts: uniq(button_texts),
+    anchor_texts: uniq(anchor_texts),
+    links: links.slice(0, 40),
+    body_text,
+    status_code: response.status
+  };
+}
+
 function isFcraSensitiveText(value) {
   const text = String(value || "");
   return FCRA_BLOCKLIST_PATTERNS.some((pattern) => pattern.test(text));
@@ -469,7 +596,8 @@ function filterOutFcraSensitiveIdeas(items) {
       item.hypothesis,
       item.expected_outcome,
       item.why_fund,
-      item.title
+      item.title,
+      item.test_name
     ].join(" ");
     return !isFcraSensitiveText(combined);
   });
@@ -482,230 +610,6 @@ function buildPortfolioCompetitors(payload) {
 
   const cleaned = uniq(incoming.map(normalizeDomain).filter(Boolean));
   return cleaned.length ? cleaned : [...DEFAULT_PORTFOLIO_COMPETITORS];
-}
-
-function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
-  return portfolioCompetitors
-    .map((competitor) => {
-      const samePeoplePattern = competitor.includes("people") && domain.includes("people");
-
-      let similarity = 25;
-      similarity += Math.round((competition.overlap_score || 0) * 0.35);
-
-      if (samePeoplePattern) similarity += 12;
-      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
-        similarity += 10;
-      }
-      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
-        similarity += 8;
-      }
-      if (competitor === domain) similarity = 100;
-
-      similarity = Math.min(100, similarity);
-
-      let reason = "Moderate thematic overlap.";
-      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
-      else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
-      else reason = "More limited overlap versus the current portfolio assumptions.";
-
-      return {
-        competitor,
-        similarity_score: similarity,
-        reason
-      };
-    })
-    .sort((a, b) => b.similarity_score - a.similarity_score)
-    .slice(0, 12);
-}
-
-function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
-  return {
-    portfolio_competitors: portfolioCompetitors,
-    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
-    overlap_by_competitor: estimatePortfolioSimilarity(
-      domain,
-      portfolioCompetitors,
-      keywordClusters,
-      competition
-    )
-  };
-}
-
-function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
-  const ideas = [...ANGLE_GENERATOR_LIBRARY];
-
-  const topKeyword = keywordClusters[0];
-  if (topKeyword) {
-    ideas.push({
-      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
-      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
-      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
-      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
-      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
-      test_format: "Dedicated campaign + use-case landing page",
-      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
-    });
-  }
-
-  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
-  if (privacyAngle) {
-    ideas.push({
-      idea_name: "Public Record Footprint Awareness",
-      marketing_hook: "Know what your public footprint may be saying about you.",
-      customer_problem: "Users may not realize how much public-record context exists around them.",
-      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
-      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Awareness-driven landing page + social creative",
-      why_test_this: "This bridges classic people-search utility with privacy positioning."
-    });
-  }
-
-  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
-  if (safetyAngle) {
-    ideas.push({
-      idea_name: "Trust Before Transaction",
-      marketing_hook: "Before you say yes, know more.",
-      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
-      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
-      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Cross-use-case landing page + ad set family",
-      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
-    });
-  }
-
-  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
-    ideas.push({
-      idea_name: "Privacy-to-Lookup Bridge",
-      marketing_hook: "Not just privacy. Know what’s actually out there.",
-      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
-      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
-      suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Bridge-message campaign",
-      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
-    });
-  }
-
-  for (const item of whitespaceUseCases.slice(0, 3)) {
-    ideas.push({
-      idea_name: `${item.use_case} Expansion`,
-      marketing_hook: item.suggested_angle,
-      customer_problem: item.use_case,
-      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
-      suggested_channels: item.channels || ["meta_ads"],
-      test_format: "Single-problem campaign test",
-      why_test_this: item.why_fund
-    });
-  }
-
-  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
-}
-
-async function analyzeSerps(domain, env) {
-  const apiKey = String(env.SERPAPI_KEY || "").trim();
-  const rows = [];
-
-  for (const query of [domain, ...COMMON_QUERY_SETS]) {
-    if (!apiKey) {
-      rows.push({
-        query,
-        source: "Not connected",
-        ads_count: null,
-        top_organic_titles: [],
-        notes: "SERPAPI_KEY is not configured."
-      });
-      continue;
-    }
-
-    try {
-      const url = new URL("https://serpapi.com/search.json");
-      url.searchParams.set("engine", "google");
-      url.searchParams.set("q", query);
-      url.searchParams.set("api_key", apiKey);
-      url.searchParams.set("num", "10");
-
-      const resp = await fetchWithTimeout(url.toString(), {}, DEFAULT_TIMEOUT_MS);
-      if (!resp.ok) throw new Error(`SERP API failed: ${resp.status}`);
-
-      const payload = await resp.json();
-      const ads = payload.ads || [];
-      const organic = payload.organic_results || [];
-
-      rows.push({
-        query,
-        source: "SerpAPI",
-        ads_count: ads.length,
-        top_organic_titles: organic.slice(0, 3).map((o) => o.title || ""),
-        notes:
-          ads.length > 0
-            ? `Detected ${ads.length} paid placements in returned snapshot.`
-            : "No paid placements detected in returned snapshot."
-      });
-    } catch (err) {
-      rows.push({
-        query,
-        source: "Unavailable",
-        ads_count: null,
-        top_organic_titles: [],
-        notes: `SERP lookup failed: ${err.message}`
-      });
-    }
-  }
-
-  return rows;
-}
-
-async function maybeCreativeFeed(domain, env) {
-  const base = String(env.AD_CREATIVE_API_BASE || "").trim();
-  if (!base) {
-    return {
-      creative_summary: "No ad creative feed configured.",
-      ad_creatives: []
-    };
-  }
-
-  try {
-    const url = new URL("/creatives", base);
-    url.searchParams.set("domain", domain);
-
-    const resp = await fetchWithTimeout(url.toString(), {}, 25000);
-    if (!resp.ok) throw new Error(`Creative feed failed: ${resp.status}`);
-
-    const payload = await resp.json();
-    return {
-      creative_summary:
-        payload.creative_summary ||
-        `Creative feed returned ${Array.isArray(payload.ad_creatives) ? payload.ad_creatives.length : 0} creatives.`,
-      ad_creatives: Array.isArray(payload.ad_creatives) ? payload.ad_creatives.slice(0, 10) : []
-    };
-  } catch (err) {
-    return {
-      creative_summary: `Creative feed configured but request failed: ${err.message}`,
-      ad_creatives: []
-    };
-  }
-}
-
-function buildDataSources(scrape, serps, adCreatives) {
-  const serpConnected = serps.some((s) => s.source === "SerpAPI");
-  const creativesConnected = (adCreatives || []).length > 0;
-
-  return [
-    {
-      name: "Homepage Crawl",
-      status: "Connected",
-      detail: `Fetched ${scrape.final_url} and parsed visible content.`
-    },
-    {
-      name: "SERP Data",
-      status: serpConnected ? "Connected" : "Not connected",
-      detail: serpConnected ? "Live SERP snapshots returned." : "No live SERP source returned."
-    },
-    {
-      name: "Ad Creatives",
-      status: creativesConnected ? "Connected" : "Not connected",
-      detail: creativesConnected ? `${adCreatives.length} creative assets returned.` : "No live creative source returned."
-    }
-  ];
 }
 
 function countMatches(text, terms) {
@@ -1212,9 +1116,7 @@ function buildSearchTermAlignment(searchTerms, keywordClusters) {
   });
 
   const alignedCount = matches.filter((m) => m.matched_cluster !== "No strong match").length;
-  const alignment_score = normalized.length
-    ? Math.round((alignedCount / normalized.length) * 100)
-    : 0;
+  const alignment_score = normalized.length ? Math.round((alignedCount / normalized.length) * 100) : 0;
 
   let interpretation = "No search terms were provided.";
   if (normalized.length) {
@@ -1277,6 +1179,122 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
   }
 
   return filterOutFcraSensitiveIdeas(plays).slice(0, 6);
+}
+
+function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
+  return portfolioCompetitors
+    .map((competitor) => {
+      const samePeoplePattern = competitor.includes("people") && domain.includes("people");
+
+      let similarity = 25;
+      similarity += Math.round((competition.overlap_score || 0) * 0.35);
+
+      if (samePeoplePattern) similarity += 12;
+      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
+        similarity += 10;
+      }
+      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
+        similarity += 8;
+      }
+      if (competitor === domain) similarity = 100;
+
+      similarity = Math.min(100, similarity);
+
+      let reason = "Moderate thematic overlap.";
+      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
+      else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
+      else reason = "More limited overlap versus the current portfolio assumptions.";
+
+      return {
+        competitor,
+        similarity_score: similarity,
+        reason
+      };
+    })
+    .sort((a, b) => b.similarity_score - a.similarity_score)
+    .slice(0, 12);
+}
+
+function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
+  return {
+    portfolio_competitors: portfolioCompetitors,
+    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
+    overlap_by_competitor: estimatePortfolioSimilarity(
+      domain,
+      portfolioCompetitors,
+      keywordClusters,
+      competition
+    )
+  };
+}
+
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
+  const ideas = [...ANGLE_GENERATOR_LIBRARY];
+
+  const topKeyword = keywordClusters[0];
+  if (topKeyword) {
+    ideas.push({
+      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
+      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
+      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
+      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
+      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
+      test_format: "Dedicated campaign + use-case landing page",
+      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
+    });
+  }
+
+  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
+  if (privacyAngle) {
+    ideas.push({
+      idea_name: "Public Record Footprint Awareness",
+      marketing_hook: "Know what your public footprint may be saying about you.",
+      customer_problem: "Users may not realize how much public-record context exists around them.",
+      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
+      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Awareness-driven landing page + social creative",
+      why_test_this: "This bridges classic people-search utility with privacy positioning."
+    });
+  }
+
+  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
+  if (safetyAngle) {
+    ideas.push({
+      idea_name: "Trust Before Transaction",
+      marketing_hook: "Before you say yes, know more.",
+      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
+      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
+      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
+      test_format: "Cross-use-case landing page + ad set family",
+      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
+    });
+  }
+
+  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
+    ideas.push({
+      idea_name: "Privacy-to-Lookup Bridge",
+      marketing_hook: "Not just privacy. Know what’s actually out there.",
+      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
+      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Bridge-message campaign",
+      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
+    });
+  }
+
+  for (const item of whitespaceUseCases.slice(0, 3)) {
+    ideas.push({
+      idea_name: `${item.use_case} Expansion`,
+      marketing_hook: item.suggested_angle,
+      customer_problem: item.use_case,
+      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
+      suggested_channels: item.channels || ["meta_ads"],
+      test_format: "Single-problem campaign test",
+      why_test_this: item.why_fund
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
 }
 
 function buildSummary(domain, scores, keywordClusters, detectedAngles) {
