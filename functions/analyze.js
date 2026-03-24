@@ -1409,69 +1409,6 @@ function buildDataSources(scrape, serps, adCreatives) {
   ];
 }
 
-function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordClusters, competition) {
-  return portfolioCompetitors
-    .map((competitor) => {
-      const samePeoplePattern = competitor.includes("people") && domain.includes("people");
-
-      let similarity = 25;
-      similarity += Math.round((competition.overlap_score || 0) * 0.35);
-
-      if (samePeoplePattern) similarity += 12;
-      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
-        similarity += 10;
-      }
-      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
-        similarity += 8;
-      }
-      if (competitor === domain) similarity = 100;
-
-      similarity = Math.min(100, similarity);
-
-      let reason = "Moderate thematic overlap.";
-      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
-      else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
-      else reason = "More limited overlap versus the current portfolio assumptions.";
-
-      return {
-        competitor,
-        similarity_score: similarity,
-        reason
-      };
-    })
-    .sort((a, b) => b.similarity_score - a.similarity_score)
-    .slice(0, 12);
-}
-
-function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, competition) {
-  return {
-    portfolio_competitors: portfolioCompetitors,
-    analyzed_domain_in_portfolio: portfolioCompetitors.includes(domain),
-    overlap_by_competitor: estimatePortfolioSimilarity(
-      domain,
-      portfolioCompetitors,
-      keywordClusters,
-      competition
-    )
-  };
-}
-
-function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
-  const ideas = [...ANGLE_GENERATOR_LIBRARY];
-
-  const topKeyword = keywordClusters[0];
-  if (topKeyword) {
-    ideas.push({
-      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
-      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
-      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
-      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
-      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
-      test_format: "Dedicated campaign + use-case landing page",
-      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
-    });
-  }
-
   const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
   if (privacyAngle) {
     ideas.push({
