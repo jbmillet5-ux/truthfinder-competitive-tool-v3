@@ -42,6 +42,14 @@ const PORTFOLIO_IDENTITY = {
     "phone lookup",
     "criminal records"
   ],
+  privacy_keywords: [
+    "privacy protection",
+    "remove my info online",
+    "data broker removal",
+    "identity protection",
+    "protect my identity",
+    "personal data protection"
+  ],
   core_problems: [
     "identify someone",
     "verify identity",
@@ -64,15 +72,15 @@ const PORTFOLIO_IDENTITY = {
 };
 
 const SCORE_WEIGHTS = {
-  keyword_opportunity: 0.2,
+  keyword_opportunity: 0.19,
   paid_intent_coverage: 0.16,
-  creative_diversity: 0.12,
-  use_case_expansion: 0.15,
+  creative_diversity: 0.11,
+  use_case_expansion: 0.14,
   offer_strength: 0.07,
   funnel_efficiency: 0.08,
   channel_expansion: 0.05,
   privacy_adjacent: 0.08,
-  testability: 0.09
+  testability: 0.12
 };
 
 const FCRA_BLOCKLIST_PATTERNS = [
@@ -293,7 +301,7 @@ const CREATIVE_ANGLES = [
   }
 ];
 
-const WHITE_SPACE_USE_CASES = [
+const BASE_WHITE_SPACE_USE_CASES = [
   {
     use_case: "Find out what a scammer could learn about you before they target you",
     suggested_angle: "Use public-records data as a digital self-exposure check.",
@@ -343,10 +351,10 @@ const ANGLE_GENERATOR_LIBRARY = [
     idea_name: "Horse Buyer Confidence Check",
     marketing_hook: "Before you buy the horse, know more about the seller.",
     customer_problem: "Private horse buyers often make expensive decisions based on limited information and trust.",
-    why_truthfinder_can_help: "Public-record context can help validate seller identity, location history, and basic trust signals before deposits or travel.",
+    why_truthfinder_can_help: "Public-record context can help validate seller identity, location history, and trust signals before deposits or travel.",
     suggested_channels: ["meta_ads", "google_ads", "display"],
     test_format: "Niche landing page + interest-targeted social ads",
-    why_test_this: "High-ticket hobby purchases run on trust and reputation. This is a non-obvious, emotionally relevant market."
+    why_test_this: "High-ticket hobby purchases run on trust and reputation."
   },
   {
     idea_name: "Wedding Invite Address Recovery",
@@ -355,12 +363,12 @@ const ANGLE_GENERATOR_LIBRARY = [
     why_truthfinder_can_help: "Public-record data can help locate or validate mailing and household information before sending expensive invitations.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
     test_format: "Seasonal search campaign + event-planning landing page",
-    why_test_this: "This reframes the product as a planning utility, not just a lookup tool, and reaches a very different audience."
+    why_test_this: "This reframes the product as a planning utility, not just a lookup tool."
   },
   {
     idea_name: "Reunion / Family Event Finder",
     marketing_hook: "Find the people you do not want to leave off the guest list.",
-    customer_problem: "People organizing reunions, memorials, weddings, and milestone events often lose contact with important people over time.",
+    customer_problem: "People organizing reunions, memorials, weddings, and milestone events often lose contact with important people.",
     why_truthfinder_can_help: "Public-record context can help reconnect organizers with old classmates, relatives, and lost contacts.",
     suggested_channels: ["meta_ads", "google_ads"],
     test_format: "Emotional story-led ads",
@@ -369,29 +377,20 @@ const ANGLE_GENERATOR_LIBRARY = [
   {
     idea_name: "Marketplace Big-Ticket Seller Check",
     marketing_hook: "Before you wire the money, know who you are dealing with.",
-    customer_problem: "Consumers buying cars, trailers, RVs, tractors, or other high-value goods from private sellers face high fraud risk.",
+    customer_problem: "Consumers buying high-value goods from private sellers face high fraud risk.",
     why_truthfinder_can_help: "Public-record data can provide identity and location context before a buyer sends money or drives long distance.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
     test_format: "Search campaign around high-risk private transactions",
-    why_test_this: "This pushes the brand into fraud-prevention and private commerce trust, which are larger than classic people-search framing."
+    why_test_this: "This pushes the brand into fraud-prevention and private commerce trust."
   },
   {
     idea_name: "Contractor Before-They-Enter Check",
     marketing_hook: "Before they enter your home, know a little more.",
-    customer_problem: "Homeowners often hire contractors, handymen, or repair workers based on limited information.",
-    why_truthfinder_can_help: "Public-record context can help create more confidence before allowing someone into the home or giving them access to family property.",
+    customer_problem: "Homeowners often hire contractors based on limited information.",
+    why_truthfinder_can_help: "Public-record context can help create more confidence before allowing someone into the home.",
     suggested_channels: ["google_ads", "meta_ads", "display"],
     test_format: "Homeowner-focused landing page + search intent test",
-    why_test_this: "Home trust is a major emotional driver and is not clearly owned by the category."
-  },
-  {
-    idea_name: "Job Search Self-Audit",
-    marketing_hook: "See what others could find about you before they do.",
-    customer_problem: "People applying for jobs may worry about what others can find about them online or through public sources.",
-    why_truthfinder_can_help: "Public-record visibility can help users understand what may shape first impressions.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Self-audit landing page + search/social test",
-    why_test_this: "This expands the product from searching others into self-awareness and reputation intelligence, while staying framed as a self-use case."
+    why_test_this: "Home trust is a major emotional driver."
   },
   {
     idea_name: "Dating App Trust Layer",
@@ -401,51 +400,6 @@ const ANGLE_GENERATOR_LIBRARY = [
     suggested_channels: ["meta_ads", "tiktok_ads", "display"],
     test_format: "Scenario-led short-form video",
     why_test_this: "This is emotionally strong, easy to understand, and highly social-friendly."
-  },
-  {
-    idea_name: "Teen Safety / Parent Reassurance",
-    marketing_hook: "Know more before your family says yes.",
-    customer_problem: "Parents worry about who their teens are dating, meeting, or spending time with.",
-    why_truthfinder_can_help: "Public-record context can provide more confidence before a parent makes a trust call.",
-    suggested_channels: ["meta_ads", "display"],
-    test_format: "Emotion-led parental concern creative",
-    why_test_this: "This is high-emotion, family-first, and underused in the category."
-  },
-  {
-    idea_name: "Elder Scam Defense",
-    marketing_hook: "Help protect the people you love from the people you do not know.",
-    customer_problem: "Older family members are often vulnerable to unknown callers, suspicious contacts, and fraud attempts.",
-    why_truthfinder_can_help: "Identity and contact lookups can reduce uncertainty before damage is done.",
-    suggested_channels: ["meta_ads", "google_ads", "display"],
-    test_format: "Family-protection campaign",
-    why_test_this: "This is a major social problem with strong emotional urgency."
-  },
-  {
-    idea_name: "Private Seller Confidence for Rural Buyers",
-    marketing_hook: "Before you drive hours or send a deposit, know who you are dealing with.",
-    customer_problem: "Rural and enthusiast buyers often buy animals, equipment, trailers, and vehicles from private sellers they do not know.",
-    why_truthfinder_can_help: "Identity and location context can reduce risk before travel, deposits, or pickup arrangements.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Niche enthusiast landing pages",
-    why_test_this: "This is a white-space trust problem with high financial stakes."
-  },
-  {
-    idea_name: "Move-In Area Confidence",
-    marketing_hook: "Before you sign, know more about where you are moving.",
-    customer_problem: "People moving to a new neighborhood often feel blind about the people and context around them.",
-    why_truthfinder_can_help: "Address, resident, and neighborhood context can reduce uncertainty before a move.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Moving / relocation landing page",
-    why_test_this: "This is a life-event use case with high emotional weight and strong intent."
-  },
-  {
-    idea_name: "Guest List Recovery for Major Life Events",
-    marketing_hook: "Do not leave the right people off the list just because you lost touch.",
-    customer_problem: "People planning weddings, funerals, reunions, and milestone celebrations often lose contact info for important people.",
-    why_truthfinder_can_help: "Public-record-based locating can help reconnect hosts and planners with the people they want to include.",
-    suggested_channels: ["meta_ads", "google_ads"],
-    test_format: "Milestone-event landing page and search campaigns",
-    why_test_this: "This reaches a very different emotional use case and broadens the brand’s functional identity."
   }
 ];
 
@@ -462,9 +416,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_TIMEOUT_M
 function normalizeInput(urlOrDomain) {
   const raw = String(urlOrDomain || "").trim();
   if (!raw) return "";
-  if (!raw.startsWith("http://") && !raw.startsWith("https://")) {
-    return `https://${raw}`;
-  }
+  if (!raw.startsWith("http://") && !raw.startsWith("https://")) return `https://${raw}`;
   return raw;
 }
 
@@ -504,6 +456,18 @@ function uniq(arr) {
   return [...new Set((arr || []).filter(Boolean))];
 }
 
+function uniqueObjectsByKey(arr, key) {
+  const seen = new Set();
+  const out = [];
+  for (const item of arr || []) {
+    const k = String(item?.[key] || "");
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push(item);
+  }
+  return out;
+}
+
 function extractMetaByName(html, name) {
   const regex1 = new RegExp(
     `<meta[^>]+name=["']${name}["'][^>]+content=["']([\\s\\S]*?)["'][^>]*>`,
@@ -529,9 +493,7 @@ async function fetchHtml(url) {
     redirect: "follow"
   });
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch page: HTTP ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`Failed to fetch page: HTTP ${response.status}`);
 
   const html = await response.text();
   const finalUrl = response.url;
@@ -539,25 +501,21 @@ async function fetchHtml(url) {
   const title = cleanText(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
   const meta_description = extractMetaByName(html, "description");
   const h1 = cleanText(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "");
-  const h2s = extractAllMatches(html, /<h2[^>]*>([\s\S]*?)<\/h2>/gi, 8);
-  const h3s = extractAllMatches(html, /<h3[^>]*>([\s\S]*?)<\/h3>/gi, 8);
+  const h2s = extractAllMatches(html, /<h2[^>]*>([\s\S]*?)<\/h2>/gi, 10);
+  const h3s = extractAllMatches(html, /<h3[^>]*>([\s\S]*?)<\/h3>/gi, 10);
   const button_texts = extractAllMatches(html, /<button[^>]*>([\s\S]*?)<\/button>/gi, 20);
   const anchor_texts = extractAllMatches(html, /<a[^>]*>([\s\S]*?)<\/a>/gi, 30);
-  const body_text = cleanText(html).slice(0, 40000);
+  const body_text = cleanText(html).slice(0, 45000);
 
   const links = [];
   const pageUrl = new URL(finalUrl);
 
   for (const match of html.matchAll(/<a[^>]+href=["']([^"']+)["']/gi)) {
     const href = String(match[1] || "").trim();
-    if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) {
-      continue;
-    }
+    if (!href || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) continue;
     try {
       const abs = new URL(href, finalUrl).toString();
-      if (new URL(abs).hostname === pageUrl.hostname && !links.includes(abs)) {
-        links.push(abs);
-      }
+      if (new URL(abs).hostname === pageUrl.hostname && !links.includes(abs)) links.push(abs);
     } catch {
       // ignore malformed urls
     }
@@ -572,7 +530,7 @@ async function fetchHtml(url) {
     h3s,
     button_texts: uniq(button_texts),
     anchor_texts: uniq(anchor_texts),
-    links: links.slice(0, 40),
+    links: links.slice(0, 50),
     body_text,
     status_code: response.status
   };
@@ -637,6 +595,12 @@ function round2(num) {
   return Math.round((Number(num) + Number.EPSILON) * 100) / 100;
 }
 
+function titleCase(str) {
+  return String(str || "")
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function getFullText(scrape) {
   return [
     scrape.title,
@@ -654,7 +618,7 @@ function buildEvidenceExtracts(scrape) {
   const extracts = [];
   if (scrape.h1) extracts.push(`Primary headline: ${scrape.h1}`);
   if (scrape.meta_description) extracts.push(`Meta description: ${scrape.meta_description}`);
-  if (scrape.h2s?.length) extracts.push(`Subheadings: ${scrape.h2s.join(" | ")}`);
+  if (scrape.h2s?.length) extracts.push(`Subheadings: ${scrape.h2s.slice(0, 6).join(" | ")}`);
   if (scrape.button_texts?.length) extracts.push(`Buttons / CTAs: ${scrape.button_texts.slice(0, 8).join(" | ")}`);
   if (scrape.anchor_texts?.length) extracts.push(`Top link text: ${scrape.anchor_texts.slice(0, 10).join(" | ")}`);
   return extracts.slice(0, 10);
@@ -664,16 +628,61 @@ function getClusterPresence(fullText, scrape) {
   return KEYWORD_CLUSTERS.map((clusterDef) => {
     const termHits = countMatches(fullText, clusterDef.keywords);
     const linkHits = countMatches((scrape.links || []).join(" "), clusterDef.keywords);
-    const visibilityScore = Math.min(100, termHits * 10 + linkHits * 8);
+    const headingHits = countMatches(
+      [scrape.h1, ...(scrape.h2s || []), ...(scrape.h3s || [])].join(" "),
+      clusterDef.keywords
+    );
+    const visibilityScore = Math.min(100, termHits * 8 + linkHits * 8 + headingHits * 14);
 
     return {
       ...clusterDef,
       detected: visibilityScore > 0,
       visibility_score: visibilityScore,
       term_hits: termHits,
-      link_hits: linkHits
+      link_hits: linkHits,
+      heading_hits: headingHits
     };
   });
+}
+
+function extractObservedQueryUniverse(scrape, clusterPresence) {
+  const text = [
+    scrape.title,
+    scrape.meta_description,
+    scrape.h1,
+    ...(scrape.h2s || []),
+    ...(scrape.h3s || []),
+    ...(scrape.button_texts || []),
+    ...(scrape.anchor_texts || [])
+  ].join(" ").toLowerCase();
+
+  const queries = [];
+
+  for (const cluster of clusterPresence) {
+    if (cluster.detected || cluster.heading_hits > 0 || cluster.term_hits > 1) {
+      for (const keyword of cluster.keywords.slice(0, 4)) {
+        queries.push(keyword);
+      }
+    }
+  }
+
+  const heuristics = [
+    { term: "phone", query: "who called me" },
+    { term: "lookup", query: "reverse lookup" },
+    { term: "people", query: "people search" },
+    { term: "records", query: "public records search" },
+    { term: "privacy", query: "protect my personal data" },
+    { term: "remove", query: "remove my info online" },
+    { term: "identity", query: "identity protection" },
+    { term: "address", query: "who lives at this address" },
+    { term: "email", query: "who owns this email" }
+  ];
+
+  for (const h of heuristics) {
+    if (text.includes(h.term)) queries.push(h.query);
+  }
+
+  return uniq(queries).slice(0, 30);
 }
 
 function buildKeywordClusters(clusterPresence, benchmarkLabel) {
@@ -746,6 +755,46 @@ function detectCreativeAngles(fullText, scrape) {
         : "Not strongly detected on-page, but relevant to the category."
     };
   }).sort((a, b) => b.trigger_hits - a.trigger_hits);
+}
+
+function buildBrandStrengths(scrape, keywordClusters, creativeAngles) {
+  const strengths = [];
+
+  const topClusters = keywordClusters
+    .filter((k) => k.detected_on_competitor)
+    .sort((a, b) => b.competitor_visibility_score - a.competitor_visibility_score)
+    .slice(0, 4);
+
+  for (const c of topClusters) {
+    strengths.push({
+      strength: c.cluster,
+      why: `Visible emphasis around ${c.cluster} with visibility score ${c.competitor_visibility_score}.`
+    });
+  }
+
+  const topAngles = creativeAngles.filter((a) => a.detected).slice(0, 3);
+  for (const a of topAngles) {
+    strengths.push({
+      strength: a.angle,
+      why: a.reason
+    });
+  }
+
+  const ctaText = [...(scrape.button_texts || []), ...(scrape.anchor_texts || [])].join(" ").toLowerCase();
+  if (ctaText.includes("protect") || ctaText.includes("privacy")) {
+    strengths.push({
+      strength: "Privacy-led CTA posture",
+      why: "Visible CTA language suggests stronger privacy or protection framing."
+    });
+  }
+  if (ctaText.includes("search") || ctaText.includes("find")) {
+    strengths.push({
+      strength: "Direct utility CTA posture",
+      why: "Visible CTA language emphasizes quick task completion and lookup utility."
+    });
+  }
+
+  return uniqueObjectsByKey(strengths, "strength").slice(0, 8);
 }
 
 function buildCreativeSummary(detectedAngles) {
@@ -884,8 +933,55 @@ function buildChannelRecommendations(keywordClusters, detectedAngles) {
   };
 }
 
-function buildWhitespaceUseCases() {
-  return WHITE_SPACE_USE_CASES;
+function buildDynamicWhitespaceUseCases(keywordClusters, creativeAngles, brandStrengths) {
+  const ideas = [...BASE_WHITE_SPACE_USE_CASES];
+
+  const strongPrivacy = brandStrengths.some((x) => /privacy/i.test(x.strength));
+  const strongUtility = brandStrengths.some((x) => /utility|people search|reverse phone/i.test(x.strength));
+  const strongProperty = keywordClusters.some((k) => k.cluster === "property records" && k.detected_on_competitor);
+
+  if (strongPrivacy) {
+    ideas.push({
+      use_case: "Personal exposure audit before a move, breakup, or major life reset",
+      suggested_angle: "See what your old public footprint is still revealing.",
+      channels: ["meta_ads", "google_ads", "display"],
+      why_it_is_white_space: "Privacy brands often stay generic instead of mapping to real life transitions.",
+      why_fund: "Life-event framing can make privacy relevance feel urgent and personal."
+    });
+  }
+
+  if (strongUtility) {
+    ideas.push({
+      use_case: "Family logistics and lost-contact recovery for weddings, reunions, funerals, and milestone events",
+      suggested_angle: "Find the people you do not want to leave out.",
+      channels: ["google_ads", "meta_ads", "display"],
+      why_it_is_white_space: "Most direct-response players do not productize reconnection around event planning.",
+      why_fund: "This broadens demand beyond suspicion or fear into practical emotional utility."
+    });
+  }
+
+  if (strongProperty) {
+    ideas.push({
+      use_case: "Private transaction confidence for rural equipment, trailers, animals, and off-market property deals",
+      suggested_angle: "Before you drive, deposit, or commit, know more.",
+      channels: ["google_ads", "meta_ads", "display"],
+      why_it_is_white_space: "This extends trust-check positioning into enthusiast and rural transaction markets.",
+      why_fund: "These buyers are high-intent and heavily motivated by avoiding mistakes."
+    });
+  }
+
+  const topExpansion = keywordClusters.find((k) => k.intent_type === "expansion");
+  if (topExpansion) {
+    ideas.push({
+      use_case: `${titleCase(topExpansion.cluster)} as a broader trust-decision category`,
+      suggested_angle: `Use ${topExpansion.cluster} to solve a bigger real-world decision, not just a lookup task.`,
+      channels: topExpansion.recommended_channels || ["google_ads"],
+      why_it_is_white_space: "Most competitors stop at the feature and do not broaden into the life decision behind the query.",
+      why_fund: "That can produce stronger creative differentiation and higher message relevance."
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "use_case")).slice(0, 10);
 }
 
 function buildTestHypotheses(whitespaceUseCases, creativeAngles) {
@@ -1006,7 +1102,44 @@ function buildOpportunityModel(priorityTests, assumptions) {
   };
 }
 
-function classifyCompetition(fullText, clusterPresence, detectedAngles) {
+function calculateQueryOverlapMetrics(observedQueries, portfolioCompetitors) {
+  const lowerQueries = uniq((observedQueries || []).map((q) => String(q).toLowerCase()));
+  const overlapGroups = [];
+
+  for (const competitor of portfolioCompetitors) {
+    const compLower = competitor.toLowerCase();
+
+    let keywordSet = [...PORTFOLIO_IDENTITY.core_keywords];
+    if (compLower.includes("cloaked")) keywordSet = [...PORTFOLIO_IDENTITY.privacy_keywords, ...PORTFOLIO_IDENTITY.adjacent_problems];
+    if (compLower.includes("whitepages")) keywordSet = [...PORTFOLIO_IDENTITY.core_keywords, "people finder", "address lookup"];
+    if (compLower.includes("spokeo")) keywordSet = [...PORTFOLIO_IDENTITY.core_keywords, "people finder", "email lookup"];
+    if (compLower.includes("beenverified")) keywordSet = [...PORTFOLIO_IDENTITY.core_keywords, "background check", "reverse phone lookup"];
+
+    const matchedQueries = [];
+    for (const query of lowerQueries) {
+      for (const kw of keywordSet) {
+        if (query.includes(kw) || kw.includes(query)) {
+          matchedQueries.push(query);
+          break;
+        }
+      }
+    }
+
+    const overlap_pct = lowerQueries.length
+      ? Math.round((uniq(matchedQueries).length / lowerQueries.length) * 100)
+      : 0;
+
+    overlapGroups.push({
+      competitor,
+      overlap_pct,
+      matched_queries: uniq(matchedQueries).slice(0, 8)
+    });
+  }
+
+  return overlapGroups.sort((a, b) => b.overlap_pct - a.overlap_pct);
+}
+
+function classifyCompetition(fullText, clusterPresence, detectedAngles, observedQueries, portfolioCompetitors) {
   const keywordOverlapHits = countMatches(fullText, PORTFOLIO_IDENTITY.core_keywords);
   const keyword_overlap = Math.min(100, keywordOverlapHits * 15);
 
@@ -1023,19 +1156,26 @@ function classifyCompetition(fullText, clusterPresence, detectedAngles) {
     ).length * 28
   );
 
+  const query_overlap_rows = calculateQueryOverlapMetrics(observedQueries, portfolioCompetitors);
+  const avg_query_overlap = query_overlap_rows.length
+    ? Math.round(query_overlap_rows.reduce((sum, r) => sum + r.overlap_pct, 0) / query_overlap_rows.length)
+    : 0;
+  const top_query_overlap = query_overlap_rows[0]?.overlap_pct || 0;
+
   const overlap_score = Math.round(
-    keyword_overlap * 0.4 +
-    problem_overlap * 0.4 +
-    audience_overlap * 0.2
+    keyword_overlap * 0.22 +
+    problem_overlap * 0.22 +
+    audience_overlap * 0.16 +
+    avg_query_overlap * 0.40
   );
 
   let competitor_type = "Indirect";
   let direct = false;
 
-  if (keyword_overlap > 50) {
+  if (top_query_overlap >= 55 || overlap_score >= 65) {
     competitor_type = "Direct";
     direct = true;
-  } else if (problem_overlap > 60 || audience_overlap > 55) {
+  } else if (avg_query_overlap >= 35 || problem_overlap > 60 || audience_overlap > 55) {
     competitor_type = "Privacy-Adjacent / Problem Competitor";
   }
 
@@ -1047,23 +1187,26 @@ function classifyCompetition(fullText, clusterPresence, detectedAngles) {
     overlap_breakdown: {
       keyword_overlap,
       problem_overlap,
-      audience_overlap
+      audience_overlap,
+      avg_query_overlap,
+      top_query_overlap
     },
+    keyword_query_overlap: query_overlap_rows,
     why_they_compete: direct
-      ? "They compete directly on similar high-intent keyword themes and monetize closely related intent."
+      ? "They compete directly on similar search-query themes and likely monetize closely related intent."
       : "They compete by solving adjacent or upstream versions of the same user problems.",
     how_they_steal_budget:
-      keyword_overlap > 50
-        ? "They likely show up in overlapping auctions, raising CPC and absorbing high-intent traffic."
+      top_query_overlap >= 55
+        ? "They likely show up in materially overlapping search queries, raising CPC and absorbing high-intent traffic."
         : "They may intercept users earlier with privacy, protection, or trust framing before users search directly for portfolio-style solutions.",
     recommended_response:
-      keyword_overlap > 50
-        ? "Defend shared keywords and improve landing-page specificity and conversion."
+      top_query_overlap >= 55
+        ? "Defend shared query themes and improve landing-page specificity and conversion."
         : "Expand messaging into their angle and capture upstream demand before it gets framed away from the portfolio."
   };
 }
 
-function buildAuctionOverlapEstimator(keywordClusters, competition) {
+function buildAuctionOverlapEstimator(keywordClusters, competition, observedQueries) {
   const top_overlap_keywords = keywordClusters
     .filter((k) => ["core", "privacy_adjacent", "adjacent"].includes(k.intent_type))
     .slice(0, 6)
@@ -1076,17 +1219,19 @@ function buildAuctionOverlapEstimator(keywordClusters, competition) {
     }));
 
   const auction_overlap_score = Math.round(
-    ((competition.overlap_breakdown?.keyword_overlap || 0) * 0.7) +
-    ((competition.overlap_breakdown?.audience_overlap || 0) * 0.3)
+    ((competition.overlap_breakdown?.avg_query_overlap || 0) * 0.7) +
+    ((competition.overlap_breakdown?.audience_overlap || 0) * 0.15) +
+    ((competition.overlap_breakdown?.keyword_overlap || 0) * 0.15)
   );
 
   let interpretation = "Low expected auction overlap.";
-  if (auction_overlap_score >= 70) interpretation = "High expected auction overlap on top-volume themes.";
-  else if (auction_overlap_score >= 45) interpretation = "Moderate expected auction overlap, especially on shared intent themes.";
+  if (auction_overlap_score >= 70) interpretation = "High expected auction overlap on top-volume search-query themes.";
+  else if (auction_overlap_score >= 45) interpretation = "Moderate expected auction overlap, especially on shared search queries.";
 
   return {
     auction_overlap_score,
     interpretation,
+    observed_query_count: (observedQueries || []).length,
     top_overlap_keywords
   };
 }
@@ -1136,7 +1281,7 @@ function buildSearchTermAlignment(searchTerms, keywordClusters) {
   };
 }
 
-function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competition) {
+function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competition, brandStrengths) {
   const plays = [];
 
   const topKeywordCluster = keywordClusters[0];
@@ -1161,18 +1306,19 @@ function buildStealTheirTrafficEngine(keywordClusters, creativeAngles, competiti
     });
   }
 
-  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
-  if (safetyAngle) {
+  const strongestDetectedAngle = creativeAngles.find((a) => a.detected);
+  if (strongestDetectedAngle) {
     plays.push({
-      play_name: "Win on emotional specificity",
-      target_cluster: safetyAngle.angle,
-      what_to_launch: `Use hooks like "${safetyAngle.hook_templates[0]}" with scenario-led ad copy.`,
-      why_this_can_work: "Scenario-led ads often outperform generic feature messaging in paid social and upper-funnel search.",
-      expected_outcome: "More qualified traffic from users with urgent, emotionally clear needs."
+      play_name: `Counter their best visible angle: ${strongestDetectedAngle.angle}`,
+      target_cluster: strongestDetectedAngle.angle,
+      what_to_launch: `Launch more specific, scenario-led variants of "${strongestDetectedAngle.hook_templates[0]}".`,
+      why_this_can_work: `The analyzed brand already shows visible strength in ${strongestDetectedAngle.angle.toLowerCase()}, which suggests real audience resonance.`,
+      expected_outcome: "Share gain from proven message territory."
     });
   }
 
-  if (competition.competitor_type !== "Direct") {
+  const privacyStrength = brandStrengths.find((s) => /privacy/i.test(s.strength));
+  if (privacyStrength && competition.competitor_type !== "Direct") {
     plays.push({
       play_name: "Capture upstream privacy-aware traffic",
       target_cluster: "privacy-aware audience",
@@ -1190,22 +1336,18 @@ function estimatePortfolioSimilarity(domain, portfolioCompetitors, keywordCluste
     .map((competitor) => {
       const samePeoplePattern = competitor.includes("people") && domain.includes("people");
 
-      let similarity = 25;
-      similarity += Math.round((competition.overlap_score || 0) * 0.35);
+      let similarity = 20;
+      similarity += Math.round((competition.overlap_score || 0) * 0.45);
 
-      if (samePeoplePattern) similarity += 12;
-      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) {
-        similarity += 10;
-      }
-      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) {
-        similarity += 8;
-      }
+      if (samePeoplePattern) similarity += 10;
+      if (competitor.includes("cloaked") && keywordClusters.some((k) => k.intent_type === "privacy_adjacent")) similarity += 10;
+      if (competitor.includes("whitepages") && keywordClusters.some((k) => k.cluster === "people search")) similarity += 8;
       if (competitor === domain) similarity = 100;
 
       similarity = Math.min(100, similarity);
 
       let reason = "Moderate thematic overlap.";
-      if (similarity >= 75) reason = "Strong likely overlap in audience, problems, or auction themes.";
+      if (similarity >= 75) reason = "Strong likely overlap in audience, search-query themes, or auction pressure.";
       else if (similarity >= 50) reason = "Some overlap in use cases or customer demand.";
       else reason = "More limited overlap versus the current portfolio assumptions.";
 
@@ -1232,7 +1374,7 @@ function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, 
   };
 }
 
-function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition) {
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition, brandStrengths, scrape, observedQueries) {
   const ideas = [...ANGLE_GENERATOR_LIBRARY];
 
   const topKeyword = keywordClusters[0];
@@ -1245,6 +1387,19 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
       suggested_channels: topKeyword.recommended_channels || ["google_ads"],
       test_format: "Dedicated campaign + use-case landing page",
       why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
+    });
+  }
+
+  const strongestAngle = creativeAngles.find((a) => a.detected);
+  if (strongestAngle) {
+    ideas.push({
+      idea_name: `${strongestAngle.angle} — sharper scenario expansion`,
+      marketing_hook: strongestAngle.hook_templates[0],
+      customer_problem: strongestAngle.user_problem,
+      why_truthfinder_can_help: "The analyzed brand already signals that this motivation resonates, but it can be expanded into narrower real-life scenarios.",
+      suggested_channels: strongestAngle.best_channels || ["google_ads"],
+      test_format: "Ad family split by scenario",
+      why_test_this: "This particular brand appears to do this theme relatively well already."
     });
   }
 
@@ -1274,6 +1429,19 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
     });
   }
 
+  const topBrandStrength = brandStrengths[0];
+  if (topBrandStrength) {
+    ideas.push({
+      idea_name: `${topBrandStrength.strength} → adjacent market expansion`,
+      marketing_hook: `Take "${topBrandStrength.strength}" into a new buying context.`,
+      customer_problem: `The analyzed brand appears strong in ${topBrandStrength.strength.toLowerCase()}, but not necessarily in the adjacent decisions that sit around it.`,
+      why_truthfinder_can_help: "Public-record data can move from a lookup feature into a decision-confidence layer.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Adjacent-market landing page test",
+      why_test_this: topBrandStrength.why
+    });
+  }
+
   if (competition?.competitor_type && competition.competitor_type !== "Direct") {
     ideas.push({
       idea_name: "Privacy-to-Lookup Bridge",
@@ -1286,7 +1454,7 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
     });
   }
 
-  for (const item of whitespaceUseCases.slice(0, 3)) {
+  for (const item of whitespaceUseCases.slice(0, 4)) {
     ideas.push({
       idea_name: `${item.use_case} Expansion`,
       marketing_hook: item.suggested_angle,
@@ -1298,7 +1466,31 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
     });
   }
 
-  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
+  if ((observedQueries || []).some((q) => q.includes("property") || q.includes("address"))) {
+    ideas.push({
+      idea_name: "Rural Buyer / Land / Property Confidence Layer",
+      marketing_hook: "Before you drive out, know more.",
+      customer_problem: "Buyers evaluating land, rural property, animals, or equipment often rely on very little verified context.",
+      why_truthfinder_can_help: "Identity and location context can reduce wasted travel and trust mistakes.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Rural buyer campaign",
+      why_test_this: "Observed query behavior suggests address or property intent that could widen into higher-value trust decisions."
+    });
+  }
+
+  if ((scrape.h1 || "").toLowerCase().includes("privacy") || (scrape.meta_description || "").toLowerCase().includes("privacy")) {
+    ideas.push({
+      idea_name: "Post-Breach Self-Check",
+      marketing_hook: "After a leak, know what someone could connect back to you.",
+      customer_problem: "People responding to breaches often feel exposed but unclear on what public context others can piece together.",
+      why_truthfinder_can_help: "The product can make vague post-breach concern more concrete and understandable.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Post-breach response landing page",
+      why_test_this: "The analyzed brand leans privacy, which suggests adjacent breach-anxiety demand may convert."
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "idea_name")).slice(0, 20);
 }
 
 async function analyzeSerps(domain, env) {
@@ -1411,11 +1603,12 @@ function buildDataSources(scrape, serps, adCreatives) {
   ];
 }
 
-function buildSummary(domain, scores, keywordClusters, detectedAngles) {
+function buildSummary(domain, scores, keywordClusters, detectedAngles, brandStrengths) {
   const topClusters = keywordClusters.slice(0, 3).map((k) => k.cluster);
   const topAngles = detectedAngles.filter((a) => a.detected).slice(0, 2).map((a) => a.angle);
+  const topStrength = brandStrengths[0]?.strength || "no single dominant theme";
 
-  return `${domain} shows ${scores.pressure_band.toLowerCase()} competitive pressure with the biggest opportunities centered on ${topClusters.join(", ") || "core lookup intent"}. The most visible creative angles are ${topAngles.join(", ").toLowerCase() || "not strongly differentiated"}, creating room to compete on sharper segmentation, privacy-adjacent positioning, and new outside-the-box use-case messaging.`;
+  return `${domain} shows ${scores.pressure_band.toLowerCase()} competitive pressure. Its clearest visible strengths appear to be ${topStrength.toLowerCase()}, with the biggest opportunities centered on ${topClusters.join(", ") || "core lookup intent"}. The most visible creative angles are ${topAngles.join(", ").toLowerCase() || "not strongly differentiated"}, which creates room to compete with sharper segmentation, stronger search-query mapping, and adjacent-market expansion.`;
 }
 
 async function analyzeCompetitor(inputUrl, env, payload = {}) {
@@ -1437,39 +1630,57 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
   const scrape = await fetchHtml(url);
   const domain = domainFromUrl(scrape.final_url);
-  const competitorName = domain
-    .replace(".com", "")
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const competitorName = titleCase(domain.replace(".com", "").replace(/-/g, " "));
 
   const fullText = getFullText(scrape).toLowerCase();
   const clusterPresence = getClusterPresence(fullText, scrape);
+  const observedQueries = extractObservedQueryUniverse(scrape, clusterPresence);
   const keyword_clusters = buildKeywordClusters(clusterPresence, "the portfolio");
   const underutilized_keywords = buildUnderutilizedKeywords(clusterPresence, "the portfolio");
   const detectedAngles = detectCreativeAngles(fullText, scrape);
   const creative_angles = detectedAngles.slice(0, 8);
-  const whitespace_use_cases = filterOutFcraSensitiveIdeas(buildWhitespaceUseCases());
+  const brand_strengths = buildBrandStrengths(scrape, keyword_clusters, creative_angles);
+  const whitespace_use_cases = buildDynamicWhitespaceUseCases(keyword_clusters, creative_angles, brand_strengths);
   const scores = scoreModel(clusterPresence, detectedAngles, scrape);
 
-  const competition_classification = classifyCompetition(fullText, clusterPresence, detectedAngles);
-  const auction_overlap_estimator = buildAuctionOverlapEstimator(keyword_clusters, competition_classification);
+  const competition_classification = classifyCompetition(
+    fullText,
+    clusterPresence,
+    detectedAngles,
+    observedQueries,
+    portfolioCompetitors
+  );
+
+  const auction_overlap_estimator = buildAuctionOverlapEstimator(
+    keyword_clusters,
+    competition_classification,
+    observedQueries
+  );
+
   const search_term_alignment = buildSearchTermAlignment(searchTerms, keyword_clusters);
+
   const steal_their_traffic_engine = buildStealTheirTrafficEngine(
     keyword_clusters,
     detectedAngles,
-    competition_classification
+    competition_classification,
+    brand_strengths
   );
+
   const portfolio_benchmark = buildPortfolioBenchmark(
     domain,
     portfolioCompetitors,
     keyword_clusters,
     competition_classification
   );
+
   const angle_generator = buildAngleGenerator(
     keyword_clusters,
     creative_angles,
     whitespace_use_cases,
-    competition_classification
+    competition_classification,
+    brand_strengths,
+    scrape,
+    observedQueries
   );
 
   const score_explanations = buildScoreExplanations(scores, clusterPresence, detectedAngles);
@@ -1506,19 +1717,20 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
   const key_observations = [
     `Competitor type vs portfolio: ${competition_classification.competitor_type}.`,
+    `Average keyword-query overlap vs portfolio: ${competition_classification.overlap_breakdown.avg_query_overlap}.`,
     `Estimated auction overlap score: ${auction_overlap_estimator.auction_overlap_score}.`,
-    `Search term alignment score: ${search_term_alignment.alignment_score}.`,
-    `Portfolio competitors supplied: ${portfolioCompetitors.length}.`,
+    `Observed query universe size: ${observedQueries.length}.`,
+    `Top visible strength: ${brand_strengths[0]?.strength || "not obvious"}.`,
     `Estimated incremental sales across priority tests: ${opportunity_model.total_estimated_incremental_sales}.`
   ];
 
   const action_plan = [
-    "Defend the highest-overlap demand themes with more specific segmentation and tighter landing-page matching.",
-    "Launch at least one privacy-adjacent bridge campaign to compete with identity / privacy brands in the portfolio.",
-    "Use search term alignment results to decide which existing terms are worth protecting or expanding.",
+    "Defend the highest-overlap search-query themes with more specific segmentation and tighter landing-page matching.",
+    "Build message families around what this brand appears to do well, then out-specific them on scenario and user problem.",
+    "Use the observed query universe and search term alignment to decide which themes are worth protecting or expanding.",
     "Run at least one steal-their-traffic play in search and one in paid social.",
-    "Test 3 to 5 fresh generated hooks from the angle generator, not just competitor-derived themes.",
-    "Measure winners at the use-case and term level, not just campaign level."
+    "Test 3 to 5 fresh generated hooks from the angle generator, especially adjacent-market and life-event ideas.",
+    "Measure winners at the query, use-case, and landing-page level, not just campaign level."
   ];
 
   return {
@@ -1531,8 +1743,10 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     page_title: scrape.title,
     meta_description: scrape.meta_description,
     headline: scrape.h1,
-    summary: buildSummary(domain, scores, keyword_clusters, detectedAngles),
+    summary: buildSummary(domain, scores, keyword_clusters, detectedAngles, brand_strengths),
 
+    observed_query_universe: observedQueries,
+    brand_strengths,
     portfolio_benchmark,
     competition_classification,
     auction_overlap_estimator,
@@ -1574,6 +1788,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
       `Fetched ${scrape.final_url} with HTTP ${scrape.status_code}`,
       `Parsed ${(scrape.links || []).length} internal links, ${(scrape.button_texts || []).length} buttons, and ${(scrape.anchor_texts || []).length} anchor texts`,
       `Detected ${keyword_clusters.filter((k) => k.detected_on_competitor).length} keyword clusters and ${creative_angles.filter((a) => a.detected).length} angle families`,
+      `Observed query universe: ${observedQueries.join(", ") || "none"}`,
       `Portfolio benchmark competitors: ${portfolioCompetitors.join(", ")}`,
       `Analysis context: market=${market}, device=${device}`,
       `Benchmark assumptions: CTR=${assumptions.benchmark_ctr_pct}%, CVR=${assumptions.benchmark_cvr_pct}%, CPC=$${assumptions.benchmark_cpc}, monthly_impr=${assumptions.benchmark_monthly_impressions}`,
@@ -1587,7 +1802,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
 export async function onRequestPost(context) {
   try {
-    console.log("ANALYZE VERSION: deduped-clean-build-v1");
+    console.log("ANALYZE VERSION: dynamic-query-overlap-v2");
     const payload = await context.request.json();
     const result = await analyzeCompetitor(payload?.url || "", context.env, payload);
 
