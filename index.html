@@ -228,6 +228,7 @@
     .small {
       font-size: 13px;
       color: var(--muted);
+      line-height: 1.45;
     }
 
     .keyValue {
@@ -325,7 +326,7 @@
     <h1>Portfolio Competitive Growth War Room</h1>
     <div class="sub">
       Analyze a brand against a portfolio of competitors, estimate auction overlap, compare search term alignment,
-      generate white-space ideas, and surface outside-the-box new market angles for products built on public-records data.
+      generate white-space ideas, surface outside-the-box new market angles, and upgrade direct-response messaging.
     </div>
 
     <div class="card">
@@ -370,7 +371,8 @@ background check before dating"></textarea>
 - What search terms overlap with our themes?
 - Where can we steal their traffic?
 - What new markets could our data unlock?
-- Give me weird but testable ideas outside the current category."></textarea>
+- Give me weird but testable ideas outside the current category.
+- What direct-response language should we test?"></textarea>
         </div>
       </div>
 
@@ -440,6 +442,18 @@ background check before dating"></textarea>
 
       <div class="grid2">
         <div class="card">
+          <h2>Brand Strengths</h2>
+          <div id="brandStrengths"></div>
+        </div>
+
+        <div class="card">
+          <h2>Observed Query Universe</h2>
+          <div id="observedQueries"></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
           <h2>Auction Overlap Estimator</h2>
           <div id="auctionOverlap"></div>
         </div>
@@ -448,6 +462,11 @@ background check before dating"></textarea>
           <h2>Search Terms Alignment</h2>
           <div id="searchTermAlignment"></div>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Keyword Query Overlap</h2>
+        <div id="keywordQueryOverlap"></div>
       </div>
 
       <div class="card">
@@ -514,6 +533,11 @@ background check before dating"></textarea>
           <h2>Why Spend Test Dollars?</h2>
           <div id="testHypotheses"></div>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Direct Response Language</h2>
+        <div id="directResponseLanguage"></div>
       </div>
 
       <div class="card">
@@ -667,12 +691,57 @@ background check before dating"></textarea>
         <div class="small" style="margin-top:12px;">
           <strong>Keyword Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.keyword_overlap ?? "")}<br>
           <strong>Problem Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.problem_overlap ?? "")}<br>
-          <strong>Audience Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.audience_overlap ?? "")}
+          <strong>Audience Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.audience_overlap ?? "")}<br>
+          <strong>Avg Query Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.avg_query_overlap ?? "")}<br>
+          <strong>Top Query Overlap:</strong> ${escapeHtml(c.overlap_breakdown?.top_query_overlap ?? "")}
         </div>
         <div class="small" style="margin-top:12px;"><strong>Why They Compete:</strong><br>${escapeHtml(c.why_they_compete || "")}</div>
         <div class="small" style="margin-top:12px;"><strong>How They Take Budget:</strong><br>${escapeHtml(c.how_they_steal_budget || "")}</div>
         <div class="small" style="margin-top:12px;"><strong>Recommended Response:</strong><br>${escapeHtml(c.recommended_response || "")}</div>
       `;
+    }
+
+    function renderBrandStrengths(data) {
+      const rows = data.brand_strengths || [];
+      document.getElementById("brandStrengths").innerHTML = rows.length
+        ? rows.map(r => `
+          <div class="box" style="margin-bottom:12px;">
+            <div class="boxTitle">${escapeHtml(r.strength)}</div>
+            <div class="small">${escapeHtml(r.why)}</div>
+          </div>
+        `).join("")
+        : `<div class="small">No brand strengths returned.</div>`;
+    }
+
+    function renderObservedQueries(data) {
+      const rows = data.observed_query_universe || [];
+      document.getElementById("observedQueries").innerHTML = rows.length
+        ? `<div>${rows.map(q => `<span class="pill blue">${escapeHtml(q)}</span>`).join("")}</div>`
+        : `<div class="small">No observed query universe returned.</div>`;
+    }
+
+    function renderKeywordQueryOverlap(data) {
+      const rows = data.competition_classification?.keyword_query_overlap || [];
+      document.getElementById("keywordQueryOverlap").innerHTML = rows.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Portfolio Competitor</th>
+              <th>Overlap %</th>
+              <th>Matched Queries</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>${escapeHtml(r.competitor)}</td>
+                <td>${escapeHtml(r.overlap_pct)}</td>
+                <td>${escapeHtml((r.matched_queries || []).join(" | "))}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="small">No keyword query overlap rows returned.</div>`;
     }
 
     function renderAuctionOverlap(data) {
@@ -681,6 +750,7 @@ background check before dating"></textarea>
       document.getElementById("auctionOverlap").innerHTML = `
         <div class="small"><strong>Estimated Auction Overlap Score:</strong> ${escapeHtml(a.auction_overlap_score ?? "")}</div>
         <div class="small" style="margin-top:8px;"><strong>Interpretation:</strong> ${escapeHtml(a.interpretation || "")}</div>
+        <div class="small" style="margin-top:8px;"><strong>Observed Query Count:</strong> ${escapeHtml(a.observed_query_count ?? "")}</div>
         ${rows.length ? `
           <table>
             <thead>
@@ -947,6 +1017,8 @@ background check before dating"></textarea>
             <div class="small" style="margin-top:6px;"><strong>Suggested channels:</strong> ${escapeHtml((r.suggested_channels || []).join(", "))}</div>
             <div class="small" style="margin-top:6px;"><strong>Test format:</strong> ${escapeHtml(r.test_format || "")}</div>
             <div class="small" style="margin-top:6px;"><strong>Why test this:</strong> ${escapeHtml(r.why_test_this || "")}</div>
+            ${r.direct_response_fit ? `<div class="small" style="margin-top:6px;"><strong>Direct-response fit:</strong> ${escapeHtml(r.direct_response_fit)}</div>` : ""}
+            ${r.why_brand_specific ? `<div class="small" style="margin-top:6px;"><strong>Why this is brand-specific:</strong> ${escapeHtml(r.why_brand_specific)}</div>` : ""}
           </div>
         `).join("")
         : `<div class="small">No generated ideas returned.</div>`;
@@ -980,6 +1052,60 @@ background check before dating"></textarea>
           </div>
         `).join("")
         : `<div class="small">No hypotheses returned.</div>`;
+    }
+
+    function renderDirectResponseLanguage(data) {
+      const dr = data.direct_response_language || {};
+      const universal = dr.universal_patterns || [];
+      const examples = dr.best_in_market_examples || {};
+      const swipes = dr.brand_specific_swipes || [];
+
+      document.getElementById("directResponseLanguage").innerHTML = `
+        <div class="small" style="margin-bottom:12px;">${escapeHtml(dr.methodology_note || "")}</div>
+
+        <div class="grid3" style="margin-bottom:16px;">
+          <div class="box">
+            <div class="boxTitle">Search Headlines</div>
+            <ul>${(examples.search_headlines || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+          </div>
+          <div class="box">
+            <div class="boxTitle">Paid Social Hooks</div>
+            <ul>${(examples.paid_social_hooks || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+          </div>
+          <div class="box">
+            <div class="boxTitle">CTA Lines</div>
+            <ul>${(examples.cta_lines || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ul>
+          </div>
+        </div>
+
+        <div class="card" style="margin:0 0 16px 0; padding:0; background:none; border:none;">
+          <h3>Universal Direct-Response Patterns</h3>
+          ${universal.length ? universal.map(p => `
+            <div class="box" style="margin-bottom:12px;">
+              <div class="boxTitle">${escapeHtml(p.pattern_name)}</div>
+              <div class="small"><strong>Formula:</strong> ${escapeHtml(p.formula)}</div>
+              <div class="small" style="margin-top:6px;"><strong>Why it works:</strong> ${escapeHtml(p.why_it_works)}</div>
+              <div class="small" style="margin-top:6px;"><strong>Industry translation:</strong> ${escapeHtml(p.industry_translation || "")}</div>
+              <div style="margin-top:10px;">
+                ${(p.examples || []).map(x => `<span class="pill blue">${escapeHtml(x)}</span>`).join("")}
+              </div>
+            </div>
+          `).join("") : `<div class="small">No universal DR patterns returned.</div>`}
+        </div>
+
+        <div class="card" style="margin:0; padding:0; background:none; border:none;">
+          <h3>Brand-Specific Swipes</h3>
+          ${swipes.length ? swipes.map(s => `
+            <div class="box" style="margin-bottom:12px;">
+              <div class="boxTitle">${escapeHtml(s.swipe_name)}</div>
+              <div class="small"><strong>Best use:</strong> ${escapeHtml(s.best_use)}</div>
+              <ul style="margin-top:8px;">
+                ${(s.examples || []).map(x => `<li>${escapeHtml(x)}</li>`).join("")}
+              </ul>
+            </div>
+          `).join("") : `<div class="small">No brand-specific swipes returned.</div>`}
+        </div>
+      `;
     }
 
     function renderChannelRecommendations(data) {
@@ -1031,6 +1157,9 @@ background check before dating"></textarea>
       if (!data.steal_their_traffic_engine?.length) warnings.push("No traffic-stealing plays returned.");
       if (!data.angle_generator?.length) warnings.push("No angle generator ideas returned.");
       if (!data.portfolio_benchmark) warnings.push("No portfolio benchmark returned.");
+      if (!data.direct_response_language) warnings.push("No direct-response language returned.");
+      if (!data.brand_strengths?.length) warnings.push("No brand strengths returned.");
+      if (!data.observed_query_universe?.length) warnings.push("No observed query universe returned.");
 
       if (warnings.length) {
         warningEl.classList.remove("hidden");
@@ -1045,8 +1174,11 @@ background check before dating"></textarea>
       resultsEl.classList.remove("hidden");
       renderOverview(data);
       renderCompetition(data);
+      renderBrandStrengths(data);
+      renderObservedQueries(data);
       renderAuctionOverlap(data);
       renderSearchTermAlignment(data);
+      renderKeywordQueryOverlap(data);
       renderPortfolioBenchmark(data);
       renderStealTraffic(data);
       renderScores(data);
@@ -1059,6 +1191,7 @@ background check before dating"></textarea>
       renderAngleGenerator(data);
       renderCreativeAngles(data);
       renderTestHypotheses(data);
+      renderDirectResponseLanguage(data);
       renderChannelRecommendations(data);
       renderSerps(data);
       document.getElementById("notes").textContent = (data.crawl_notes || []).join("\n");
@@ -1127,7 +1260,9 @@ background check before dating"></textarea>
         ...((latestResult.steal_their_traffic_engine || []).map(v => ({ category: "steal_traffic_play", value: `${v.play_name} | ${v.target_cluster}` }))),
         ...(((latestResult.search_term_alignment || {}).matches || []).map(v => ({ category: "search_term_match", value: `${v.search_term} | ${v.matched_cluster}` }))),
         ...((latestResult.angle_generator || []).map(v => ({ category: "angle_generator", value: `${v.idea_name} | ${v.marketing_hook}` }))),
-        ...((((latestResult.portfolio_benchmark || {}).overlap_by_competitor) || []).map(v => ({ category: "portfolio_overlap", value: `${v.competitor} | ${v.similarity_score}` })))
+        ...((((latestResult.portfolio_benchmark || {}).overlap_by_competitor) || []).map(v => ({ category: "portfolio_overlap", value: `${v.competitor} | ${v.similarity_score}` }))),
+        ...((latestResult.brand_strengths || []).map(v => ({ category: "brand_strength", value: `${v.strength} | ${v.why}` }))),
+        ...((latestResult.observed_query_universe || []).map(v => ({ category: "observed_query", value: v })))
       ];
 
       try {
