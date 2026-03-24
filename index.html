@@ -433,7 +433,8 @@ background check before dating"></textarea>
       <div class="card" style="margin-top:16px; margin-bottom:0;">
         <h3 style="margin-bottom:10px;">Meta Ad Library Links</h3>
         <div class="small">
-          Edit Meta Ad Library links directly here. These are saved locally in your browser for future sessions on this machine.
+          Every competitor below will have a clickable Meta Ad Library link in the results. If no exact page link is saved,
+          the UI automatically uses a Meta Ad Library keyword-search fallback for that brand. You can still override any brand with the exact link here.
         </div>
 
         <div class="row" style="margin-top:12px; align-items:end;">
@@ -442,7 +443,7 @@ background check before dating"></textarea>
             <input id="metaLinkDomainInput" type="text" placeholder="e.g. beenverified.com" />
           </div>
           <div class="grow">
-            <label for="metaLinkUrlInput">Meta Ad Library URL</label>
+            <label for="metaLinkUrlInput">Exact Meta Ad Library URL</label>
             <input id="metaLinkUrlInput" type="text" placeholder="Paste the full Meta Ad Library URL" />
           </div>
           <div class="narrow">
@@ -645,7 +646,7 @@ background check before dating"></textarea>
       "beenverified.com": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&is_targeted_country=false&media_type=all&search_type=page&sort_data[direction]=desc&sort_data[mode]=total_impressions&view_all_page_id=506883915831965"
     };
 
-    const META_STORAGE_KEY = "pcgw_meta_ad_library_links_v1";
+    const META_STORAGE_KEY = "pcgw_meta_ad_library_links_v2";
 
     let portfolioCompetitors = [...DEFAULT_PORTFOLIO];
 
@@ -702,6 +703,33 @@ background check before dating"></textarea>
       return "green";
     }
 
+    function brandKeywordFromDomain(domain) {
+      const d = normalizeDomain(domain);
+      return d.replace(".com", "").replace(/[-_]/g, " ");
+    }
+
+    function buildMetaLibraryFallbackUrl(domain) {
+      const brandKeyword = brandKeywordFromDomain(domain);
+      const url = new URL("https://www.facebook.com/ads/library/");
+      url.searchParams.set("active_status", "active");
+      url.searchParams.set("ad_type", "all");
+      url.searchParams.set("country", "US");
+      url.searchParams.set("is_targeted_country", "false");
+      url.searchParams.set("media_type", "all");
+      url.searchParams.set("search_type", "keyword_unordered");
+      url.searchParams.set("q", brandKeyword);
+      return url.toString();
+    }
+
+    function getMetaLibraryUrl(domain) {
+      const normalized = normalizeDomain(domain);
+      return metaAdLinks[normalized] || buildMetaLibraryFallbackUrl(normalized);
+    }
+
+    function hasExactMetaLibraryLink(domain) {
+      return Boolean(metaAdLinks[normalizeDomain(domain)]);
+    }
+
     function loadMetaLinks() {
       try {
         const raw = localStorage.getItem(META_STORAGE_KEY);
@@ -748,16 +776,26 @@ background check before dating"></textarea>
       const domains = getAllKnownDomains();
 
       metaLinksEditor.innerHTML = domains.length ? domains.map((domain) => {
-        const link = metaAdLinks[domain] || "";
+        const exactLink = metaAdLinks[domain] || "";
+        const fallbackLink = buildMetaLibraryFallbackUrl(domain);
+
         return `
           <div class="metaRow">
             <div class="metaDomain">${escapeHtml(domain)}</div>
-            <input
-              type="text"
-              value="${escapeHtml(link)}"
-              data-meta-domain="${escapeHtml(domain)}"
-              placeholder="Paste Meta Ad Library URL"
-            />
+            <div>
+              <input
+                type="text"
+                value="${escapeHtml(exactLink)}"
+                data-meta-domain="${escapeHtml(domain)}"
+                placeholder="Paste exact Meta Ad Library page URL (optional)"
+              />
+              <div class="small" style="margin-top:6px;">
+                ${exactLink
+                  ? `Exact page link saved.`
+                  : `No exact page link saved. Fallback will be used: <a href="${escapeHtml(fallbackLink)}" target="_blank" rel="noopener noreferrer">Open fallback search</a>`
+                }
+              </div>
+            </div>
             <button class="removeBtn smallBtn" data-remove-meta="${escapeHtml(domain)}">Clear</button>
           </div>
         `;
@@ -770,6 +808,7 @@ background check before dating"></textarea>
           if (value) metaAdLinks[domain] = value;
           else delete metaAdLinks[domain];
           saveMetaLinks();
+          renderMetaLinksEditor();
         });
       });
 
@@ -1014,15 +1053,17 @@ background check before dating"></textarea>
     }
 
     function renderMetaAdLibrary(data) {
-      const analyzedDomain = String(data.domain || "").toLowerCase();
+      const analyzedDomain = normalizeDomain(data.domain || "");
       const portfolio = (data.portfolio_benchmark?.portfolio_competitors || portfolioCompetitors || []);
       const uniqueDomains = [...new Set([analyzedDomain, ...portfolio].filter(Boolean))];
 
       const rows = uniqueDomains.map((domain) => {
-        const link = metaAdLinks[domain] || "";
+        const exact = hasExactMetaLibraryLink(domain);
+        const link = getMetaLibraryUrl(domain);
         return {
           domain,
           link,
+          exact,
           isAnalyzed: domain === analyzedDomain
         };
       });
@@ -1032,7 +1073,7 @@ background check before dating"></textarea>
           <thead>
             <tr>
               <th>Brand</th>
-              <th>Status</th>
+              <th>Link Type</th>
               <th>Meta Ad Library</th>
             </tr>
           </thead>
@@ -1043,12 +1084,11 @@ background check before dating"></textarea>
                   <strong>${escapeHtml(r.domain)}</strong>
                   ${r.isAnalyzed ? `<span class="pill gold" style="margin-left:8px;">Analyzed Brand</span>` : ""}
                 </td>
-                <td>${r.link ? "Linked" : "Missing link"}</td>
+                <td>${r.exact ? "Exact page link" : "Keyword search fallback"}</td>
                 <td>
-                  ${r.link
-                    ? `<a href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer">Open Meta Ad Library</a>`
-                    : `<span class="small">Add link in Meta Ad Library Links editor above</span>`
-                  }
+                  <a href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer">
+                    Open Meta Ad Library
+                  </a>
                 </td>
               </tr>
             `).join("")}
@@ -1385,9 +1425,9 @@ background check before dating"></textarea>
       if (!data.brand_strengths?.length) warnings.push("No brand strengths returned.");
       if (!data.observed_query_universe?.length) warnings.push("No observed query universe returned.");
 
-      const analyzedDomain = String(data.domain || "").toLowerCase();
-      if (analyzedDomain && !metaAdLinks[analyzedDomain]) {
-        warnings.push(`No Meta Ad Library link mapped for analyzed domain: ${analyzedDomain}`);
+      const analyzedDomain = normalizeDomain(data.domain || "");
+      if (analyzedDomain && !hasExactMetaLibraryLink(analyzedDomain)) {
+        warnings.push(`Analyzed domain ${analyzedDomain} is using a keyword-search Meta Ad Library fallback instead of an exact page link.`);
       }
 
       if (warnings.length) {
