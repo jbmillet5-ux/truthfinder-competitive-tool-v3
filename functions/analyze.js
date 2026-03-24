@@ -102,7 +102,7 @@ const FCRA_BLOCKLIST_PATTERNS = [
   /\bqualification\b/i,
   /\badverse action\b/i,
   /\bconsumer report\b/i,
-  /\bFCRA\b/i,
+  /\bfcra\b/i,
   /\bscreen applicant\b/i,
   /\bscreening report\b/i,
   /\bemployment decision\b/i,
@@ -599,7 +599,8 @@ function filterOutFcraSensitiveIdeas(items) {
       item.expected_outcome,
       item.why_fund,
       item.title,
-      item.test_name
+      item.test_name,
+      item.play_name
     ].join(" ");
     return !isFcraSensitiveText(combined);
   });
@@ -618,7 +619,7 @@ function countMatches(text, terms) {
   const lower = String(text || "").toLowerCase();
   let hits = 0;
   for (const term of terms) {
-    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const escaped = String(term || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const matches = lower.match(new RegExp(escaped, "g"));
     hits += matches ? matches.length : 0;
   }
@@ -889,6 +890,7 @@ function buildWhitespaceUseCases() {
 
 function buildTestHypotheses(whitespaceUseCases, creativeAngles) {
   const rows = [];
+
   for (const item of whitespaceUseCases.slice(0, 5)) {
     rows.push({
       title: item.use_case,
@@ -1409,59 +1411,6 @@ function buildDataSources(scrape, serps, adCreatives) {
   ];
 }
 
-  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
-  if (privacyAngle) {
-    ideas.push({
-      idea_name: "Public Record Footprint Awareness",
-      marketing_hook: "Know what your public footprint may be saying about you.",
-      customer_problem: "Users may not realize how much public-record context exists around them.",
-      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
-      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Awareness-driven landing page + social creative",
-      why_test_this: "This bridges classic people-search utility with privacy positioning."
-    });
-  }
-
-  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
-  if (safetyAngle) {
-    ideas.push({
-      idea_name: "Trust Before Transaction",
-      marketing_hook: "Before you say yes, know more.",
-      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
-      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
-      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Cross-use-case landing page + ad set family",
-      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
-    });
-  }
-
-  if (competition?.competitor_type && competition.competitor_type !== "Direct") {
-    ideas.push({
-      idea_name: "Privacy-to-Lookup Bridge",
-      marketing_hook: "Not just privacy. Know what’s actually out there.",
-      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
-      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
-      suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Bridge-message campaign",
-      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
-    });
-  }
-
-  for (const item of whitespaceUseCases.slice(0, 3)) {
-    ideas.push({
-      idea_name: `${item.use_case} Expansion`,
-      marketing_hook: item.suggested_angle,
-      customer_problem: item.use_case,
-      why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
-      suggested_channels: item.channels || ["meta_ads"],
-      test_format: "Single-problem campaign test",
-      why_test_this: item.why_fund
-    });
-  }
-
-  return filterOutFcraSensitiveIdeas(ideas).slice(0, 20);
-}
-
 function buildSummary(domain, scores, keywordClusters, detectedAngles) {
   const topClusters = keywordClusters.slice(0, 3).map((k) => k.cluster);
   const topAngles = detectedAngles.filter((a) => a.detected).slice(0, 2).map((a) => a.angle);
@@ -1529,15 +1478,21 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
   const creative_summary_base = buildCreativeSummary(detectedAngles);
   let ad_creatives = buildAdCreativeCards(detectedAngles, competitorName);
-  const liveCreativePayload = await maybeCreativeFeed(domain, env);
+
+  const liveCreativePayload = await maybeCreativeFeed(domain, env).catch(() => ({
+    creative_summary: "Creative feed unavailable.",
+    ad_creatives: []
+  }));
+
   if ((liveCreativePayload.ad_creatives || []).length) {
     ad_creatives = liveCreativePayload.ad_creatives;
   }
+
   const creative_summary = (liveCreativePayload.ad_creatives || []).length
     ? liveCreativePayload.creative_summary
     : creative_summary_base;
 
-  const serps = await analyzeSerps(domain, env);
+  const serps = await analyzeSerps(domain, env).catch(() => []);
   const channel_recommendations = buildChannelRecommendations(keyword_clusters, detectedAngles);
   const test_hypotheses = buildTestHypotheses(whitespace_use_cases, creative_angles);
   const priority_tests = buildPriorityTests(
@@ -1632,6 +1587,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
 export async function onRequestPost(context) {
   try {
+    console.log("ANALYZE VERSION: deduped-clean-build-v1");
     const payload = await context.request.json();
     const result = await analyzeCompetitor(payload?.url || "", context.env, payload);
 
