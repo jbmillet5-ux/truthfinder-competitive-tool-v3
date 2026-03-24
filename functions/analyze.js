@@ -76,11 +76,11 @@ const SCORE_WEIGHTS = {
   paid_intent_coverage: 0.16,
   creative_diversity: 0.11,
   use_case_expansion: 0.14,
-  offer_strength: 0.07,
+  offer_strength: 0.08,
   funnel_efficiency: 0.08,
   channel_expansion: 0.05,
   privacy_adjacent: 0.08,
-  testability: 0.12
+  testability: 0.11
 };
 
 const FCRA_BLOCKLIST_PATTERNS = [
@@ -301,105 +301,224 @@ const CREATIVE_ANGLES = [
   }
 ];
 
-const BASE_WHITE_SPACE_USE_CASES = [
-  {
-    use_case: "Find out what a scammer could learn about you before they target you",
-    suggested_angle: "Use public-records data as a digital self-exposure check.",
-    channels: ["meta_ads", "google_ads", "display"],
-    why_it_is_white_space: "Most competitors separate search and privacy instead of blending self-exposure awareness with discoverability.",
-    why_fund: "This creates new demand by turning the product into both a lookup and self-protection insight tool."
-  },
-  {
-    use_case: "Protect elderly parents from unknown callers and suspicious contacts",
-    suggested_angle: "Help your family know who is behind the number.",
-    channels: ["meta_ads", "display", "google_ads"],
-    why_it_is_white_space: "Most messaging is self-focused instead of family-protection focused.",
-    why_fund: "Family-protection angles are emotionally strong and can convert higher-intent users."
-  },
-  {
-    use_case: "Check someone before you meet, transact, or trust them in daily life",
-    suggested_angle: "Know more before you say yes.",
-    channels: ["google_ads", "meta_ads", "display"],
-    why_it_is_white_space: "The category rarely broadens into everyday trust decisions outside the usual lookup framing.",
-    why_fund: "Specific decision moments can outperform broad generic messaging."
-  },
-  {
-    use_case: "Marketplace safety before meeting a buyer or seller",
-    suggested_angle: "Verify before you meet or transact.",
-    channels: ["meta_ads", "tiktok_ads", "display"],
-    why_it_is_white_space: "Peer-to-peer transaction risk is under-modeled in most category advertising.",
-    why_fund: "This is story-friendly, emotionally vivid, and well suited for paid social."
-  },
-  {
-    use_case: "See your own digital footprint before a job search or first date",
-    suggested_angle: "Know what others could find before they search you.",
-    channels: ["meta_ads", "google_ads", "display"],
-    why_it_is_white_space: "Most players focus on searching others, not helping users understand their own discoverability.",
-    why_fund: "This expands category demand and bridges directly into privacy competitor territory."
-  },
-  {
-    use_case: "Contractor or in-home worker trust check for your own peace of mind",
-    suggested_angle: "Before they enter your home, know a little more.",
-    channels: ["google_ads", "meta_ads", "display"],
-    why_it_is_white_space: "Homeowner trust is not a common direct-response angle in the category.",
-    why_fund: "It maps to high perceived risk and clear trust intent."
-  }
-];
+const DYNAMIC_IDEA_POOLS = {
+  phone: [
+    {
+      idea_name: "Family Scam Defense",
+      marketing_hook: "Help your family know who is really calling.",
+      customer_problem: "Unknown-call anxiety spikes when a caller may target older family members or vulnerable loved ones.",
+      why_truthfinder_can_help: "Phone and identity context can reduce uncertainty before a scam escalates.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Bottom-funnel unknown-caller landing page",
+      why_test_this: "Strong direct-response pain, clear intent, and easy CTA."
+    },
+    {
+      idea_name: "Urgent Caller Resolution",
+      marketing_hook: "Unknown number? Get clarity before you call back.",
+      customer_problem: "Users want immediate answers before engaging with a number they do not recognize.",
+      why_truthfinder_can_help: "Reverse-phone-style utility maps directly to a fast task-completion funnel.",
+      suggested_channels: ["google_ads", "bing_ads", "display"],
+      test_format: "Search-first DR funnel",
+      why_test_this: "This is immediate, transactional, and bottom-funnel by nature."
+    },
+    {
+      idea_name: "Missed Call Confidence Layer",
+      marketing_hook: "One search before you answer can save you a headache.",
+      customer_problem: "A user does not know whether a missed call is important, risky, or spammy.",
+      why_truthfinder_can_help: "The product can turn uncertainty into a quick verification action.",
+      suggested_channels: ["google_ads", "meta_ads"],
+      test_format: "Mobile-focused search and retargeting",
+      why_test_this: "Fast, low-friction intent with clean action language."
+    }
+  ],
+  privacy: [
+    {
+      idea_name: "Post-Breach Self-Check",
+      marketing_hook: "After a leak, see what public context someone could connect back to you.",
+      customer_problem: "Users reacting to a breach often feel exposed but do not know how much context is actually discoverable.",
+      why_truthfinder_can_help: "Public-record awareness makes abstract exposure concerns more concrete.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Privacy intent landing page",
+      why_test_this: "Privacy-aware users have strong problem awareness and urgency."
+    },
+    {
+      idea_name: "Breakup / Move Exposure Reset",
+      marketing_hook: "Big life change? See what your old footprint is still revealing.",
+      customer_problem: "Users leaving a relationship or moving may want more control over what is easy to find.",
+      why_truthfinder_can_help: "Public-record visibility makes the exposure problem legible and urgent.",
+      suggested_channels: ["meta_ads", "google_ads", "display"],
+      test_format: "Life-event DR landing page",
+      why_test_this: "Life transitions heighten urgency and response."
+    },
+    {
+      idea_name: "Digital Footprint Audit",
+      marketing_hook: "Know what someone could find before they search you.",
+      customer_problem: "Users worry about discoverability but lack a clear next step.",
+      why_truthfinder_can_help: "The product can function as a self-audit and awareness tool.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Self-audit funnel",
+      why_test_this: "Strong problem language, clean CTA, adjacent to privacy demand."
+    }
+  ],
+  people: [
+    {
+      idea_name: "Wedding / Reunion Guest Recovery",
+      marketing_hook: "Do not leave the right people off the list just because you lost touch.",
+      customer_problem: "Hosts planning weddings, reunions, or milestone events often need updated contact paths fast.",
+      why_truthfinder_can_help: "Public-record context can help reconnect planners with important people.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Event-planning utility funnel",
+      why_test_this: "Task-driven and emotionally motivated."
+    },
+    {
+      idea_name: "Family Milestone Outreach",
+      marketing_hook: "When the moment matters, find the people you need to reach.",
+      customer_problem: "Major life events create urgency around reconnecting with relatives and old contacts.",
+      why_truthfinder_can_help: "Public-record tools can support practical reconnection workflows.",
+      suggested_channels: ["google_ads", "meta_ads"],
+      test_format: "Milestone-event campaign",
+      why_test_this: "High emotional relevance with clear action."
+    },
+    {
+      idea_name: "Old Contact Recovery",
+      marketing_hook: "Need to find someone again? Start with the fastest path back.",
+      customer_problem: "Users have a real person and a real need, but outdated information.",
+      why_truthfinder_can_help: "This is directly aligned to core people-search utility.",
+      suggested_channels: ["google_ads", "bing_ads", "display"],
+      test_format: "Search-first direct response funnel",
+      why_test_this: "Very clean bottom-funnel search behavior."
+    }
+  ],
+  property: [
+    {
+      idea_name: "Private Seller Confidence Check",
+      marketing_hook: "Before you drive, deposit, or decide, know who you are dealing with.",
+      customer_problem: "Users making private transactions around property, equipment, or high-value goods often rely on little verified context.",
+      why_truthfinder_can_help: "Identity and location context can reduce wasted travel and trust mistakes.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Transaction-risk landing page",
+      why_test_this: "High intent, high consequence, strong DR framing."
+    },
+    {
+      idea_name: "Neighborhood Confidence Layer",
+      marketing_hook: "Before you move in, know more about where you are landing.",
+      customer_problem: "Moving decisions create uncertainty around nearby residents and local context.",
+      why_truthfinder_can_help: "Address and resident context can reduce uncertainty during a move decision.",
+      suggested_channels: ["google_ads", "display", "meta_ads"],
+      test_format: "Move-intent landing page",
+      why_test_this: "Life-event urgency plus clear practical utility."
+    },
+    {
+      idea_name: "Rural Buyer / Land Confidence Check",
+      marketing_hook: "Before you travel hours or send money, know more.",
+      customer_problem: "Land, equipment, trailer, and off-grid buyers often make trust calls on thin information.",
+      why_truthfinder_can_help: "Location and identity context can lower fraud and wasted-travel risk.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Niche rural transaction funnel",
+      why_test_this: "Specific niche, strong pain, clear CTA."
+    }
+  ],
+  safety: [
+    {
+      idea_name: "Before-the-Meetup Check",
+      marketing_hook: "Before you meet, know more.",
+      customer_problem: "Users meeting someone from dating apps, marketplaces, or social networks want reassurance fast.",
+      why_truthfinder_can_help: "Public-record context can serve as a trust-check layer before an in-person interaction.",
+      suggested_channels: ["google_ads", "meta_ads", "tiktok_ads"],
+      test_format: "Scenario-led DR funnel",
+      why_test_this: "Immediate user motivation with strong direct-response potential."
+    },
+    {
+      idea_name: "Before-They-Enter-Your-Home Check",
+      marketing_hook: "Before they enter your home, know a little more.",
+      customer_problem: "Homeowners hiring contractors, cleaners, or repair workers often have limited trust context.",
+      why_truthfinder_can_help: "The product can support a practical trust verification step.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Home services trust funnel",
+      why_test_this: "Strong emotional consequence and highly legible CTA."
+    },
+    {
+      idea_name: "Marketplace Meetup Safety Layer",
+      marketing_hook: "Before the meetup, know who is really showing up.",
+      customer_problem: "Peer-to-peer transactions create physical safety and fraud concerns.",
+      why_truthfinder_can_help: "Identity context can reduce uncertainty before a meetup or exchange.",
+      suggested_channels: ["meta_ads", "google_ads", "display"],
+      test_format: "Meetup-risk campaign",
+      why_test_this: "High anxiety, clean pain point, strong conversion logic."
+    }
+  ],
+  identity: [
+    {
+      idea_name: "Email Sender Reality Check",
+      marketing_hook: "Before you click back, know who is behind the message.",
+      customer_problem: "Users receiving sketchy emails want a fast validation step.",
+      why_truthfinder_can_help: "Identity-linked context can reduce fraud uncertainty.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Message-verification DR funnel",
+      why_test_this: "Very direct pain, action, and payoff."
+    },
+    {
+      idea_name: "Suspicious Contact Verification",
+      marketing_hook: "Before you trust the message, check the person.",
+      customer_problem: "Text, email, and social message contacts can feel ambiguous and risky.",
+      why_truthfinder_can_help: "Public-record context can support a verification step before engagement.",
+      suggested_channels: ["google_ads", "meta_ads", "display"],
+      test_format: "Verify-before-reply funnel",
+      why_test_this: "High concern, immediate intent."
+    }
+  ]
+};
 
-const ANGLE_GENERATOR_LIBRARY = [
+const DIRECT_RESPONSE_PATTERN_BANK = [
   {
-    idea_name: "Horse Buyer Confidence Check",
-    marketing_hook: "Before you buy the horse, know more about the seller.",
-    customer_problem: "Private horse buyers often make expensive decisions based on limited information and trust.",
-    why_truthfinder_can_help: "Public-record context can help validate seller identity, location history, and trust signals before deposits or travel.",
-    suggested_channels: ["meta_ads", "google_ads", "display"],
-    test_format: "Niche landing page + interest-targeted social ads",
-    why_test_this: "High-ticket hobby purchases run on trust and reputation."
+    pattern_name: "Problem + Immediate Payoff",
+    formula: "[Pain point]? [Fast relief].",
+    why_it_works: "It gets to the problem immediately and promises a near-term outcome.",
+    examples: [
+      "Unknown number? Get answers fast.",
+      "Need to know who called? Start here.",
+      "Before you trust them, know more."
+    ]
   },
   {
-    idea_name: "Wedding Invite Address Recovery",
-    marketing_hook: "Trying to track down the right address before sending invitations?",
-    customer_problem: "Couples planning weddings and major events often do not have up-to-date mailing addresses for extended friends and family.",
-    why_truthfinder_can_help: "Public-record data can help locate or validate mailing and household information before sending expensive invitations.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Seasonal search campaign + event-planning landing page",
-    why_test_this: "This reframes the product as a planning utility, not just a lookup tool."
+    pattern_name: "Consequence + Prevention",
+    formula: "[Bad outcome] can happen. [Simple action] helps prevent it.",
+    why_it_works: "This structure raises stakes without wasting words.",
+    examples: [
+      "A quick check can save you a major mistake.",
+      "One search now can prevent a bad decision later.",
+      "Do the check before the damage is done."
+    ]
   },
   {
-    idea_name: "Reunion / Family Event Finder",
-    marketing_hook: "Find the people you do not want to leave off the guest list.",
-    customer_problem: "People organizing reunions, memorials, weddings, and milestone events often lose contact with important people.",
-    why_truthfinder_can_help: "Public-record context can help reconnect organizers with old classmates, relatives, and lost contacts.",
-    suggested_channels: ["meta_ads", "google_ads"],
-    test_format: "Emotional story-led ads",
-    why_test_this: "This brings reconnection into emotionally meaningful, milestone-driven use cases."
+    pattern_name: "Specific Moment-of-Need",
+    formula: "Before [moment], [action/result].",
+    why_it_works: "Moment framing tends to outperform generic feature language in direct response.",
+    examples: [
+      "Before you meet, know more.",
+      "Before you call back, get clarity.",
+      "Before you send the deposit, check first."
+    ]
   },
   {
-    idea_name: "Marketplace Big-Ticket Seller Check",
-    marketing_hook: "Before you wire the money, know who you are dealing with.",
-    customer_problem: "Consumers buying high-value goods from private sellers face high fraud risk.",
-    why_truthfinder_can_help: "Public-record data can provide identity and location context before a buyer sends money or drives long distance.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Search campaign around high-risk private transactions",
-    why_test_this: "This pushes the brand into fraud-prevention and private commerce trust."
+    pattern_name: "Curiosity + Utility",
+    formula: "[Question]? [Utility answer].",
+    why_it_works: "This combines natural curiosity with clear functional benefit.",
+    examples: [
+      "Who just called you?",
+      "Who lives there?",
+      "What can someone find about you?"
+    ]
   },
   {
-    idea_name: "Contractor Before-They-Enter Check",
-    marketing_hook: "Before they enter your home, know a little more.",
-    customer_problem: "Homeowners often hire contractors based on limited information.",
-    why_truthfinder_can_help: "Public-record context can help create more confidence before allowing someone into the home.",
-    suggested_channels: ["google_ads", "meta_ads", "display"],
-    test_format: "Homeowner-focused landing page + search intent test",
-    why_test_this: "Home trust is a major emotional driver."
-  },
-  {
-    idea_name: "Dating App Trust Layer",
-    marketing_hook: "Before the first date, know a little more.",
-    customer_problem: "Online dating creates uncertainty around whether someone is who they say they are.",
-    why_truthfinder_can_help: "Public-record context can help validate identity and provide more confidence before an in-person meeting.",
-    suggested_channels: ["meta_ads", "tiktok_ads", "display"],
-    test_format: "Scenario-led short-form video",
-    why_test_this: "This is emotionally strong, easy to understand, and highly social-friendly."
+    pattern_name: "Direct Command CTA",
+    formula: "[Verb] [object] now.",
+    why_it_works: "When intent is bottom-funnel, clarity often beats cleverness.",
+    examples: [
+      "Search the number now.",
+      "Check the person first.",
+      "See the public footprint."
+    ]
   }
 ];
 
@@ -466,6 +585,27 @@ function uniqueObjectsByKey(arr, key) {
     out.push(item);
   }
   return out;
+}
+
+function hashString(str) {
+  let hash = 0;
+  const s = String(str || "");
+  for (let i = 0; i < s.length; i += 1) {
+    hash = ((hash << 5) - hash) + s.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function deterministicPick(items, seed, count = 3) {
+  const arr = [...(items || [])];
+  if (!arr.length) return [];
+  const scored = arr.map((item, idx) => ({
+    item,
+    score: hashString(`${seed}|${idx}|${JSON.stringify(item)}`)
+  }));
+  scored.sort((a, b) => a.score - b.score);
+  return scored.slice(0, Math.min(count, scored.length)).map((x) => x.item);
 }
 
 function extractMetaByName(html, name) {
@@ -675,7 +815,9 @@ function extractObservedQueryUniverse(scrape, clusterPresence) {
     { term: "remove", query: "remove my info online" },
     { term: "identity", query: "identity protection" },
     { term: "address", query: "who lives at this address" },
-    { term: "email", query: "who owns this email" }
+    { term: "email", query: "who owns this email" },
+    { term: "caller", query: "unknown caller lookup" },
+    { term: "neighbor", query: "who lives next door" }
   ];
 
   for (const h of heuristics) {
@@ -797,6 +939,62 @@ function buildBrandStrengths(scrape, keywordClusters, creativeAngles) {
   return uniqueObjectsByKey(strengths, "strength").slice(0, 8);
 }
 
+function detectSignalFamilies(keywordClusters, creativeAngles, scrape, observedQueries) {
+  const signals = new Set();
+  const text = getFullText(scrape).toLowerCase();
+
+  if (keywordClusters.some((k) => k.cluster === "reverse phone lookup" && k.detected_on_competitor)) signals.add("phone");
+  if (keywordClusters.some((k) => k.intent_type === "privacy_adjacent" && k.detected_on_competitor)) signals.add("privacy");
+  if (keywordClusters.some((k) => k.cluster === "people search" && k.detected_on_competitor)) signals.add("people");
+  if (keywordClusters.some((k) => ["property records", "reverse address lookup"].includes(k.cluster) && k.detected_on_competitor)) signals.add("property");
+  if (creativeAngles.some((a) => a.angle === "Safety / protect myself" && a.detected)) signals.add("safety");
+  if (creativeAngles.some((a) => a.angle === "Identity / scam / fraud concern" && a.detected)) signals.add("identity");
+  if (creativeAngles.some((a) => a.angle === "Reconnection / find someone" && a.detected)) signals.add("people");
+  if ((observedQueries || []).some((q) => q.includes("phone") || q.includes("caller"))) signals.add("phone");
+  if ((observedQueries || []).some((q) => q.includes("privacy") || q.includes("remove my info"))) signals.add("privacy");
+  if ((observedQueries || []).some((q) => q.includes("people") || q.includes("find"))) signals.add("people");
+  if ((observedQueries || []).some((q) => q.includes("address") || q.includes("property"))) signals.add("property");
+  if (text.includes("verify")) signals.add("identity");
+
+  if (!signals.size) {
+    signals.add("people");
+    signals.add("identity");
+  }
+
+  return [...signals];
+}
+
+function buildDynamicWhitespaceUseCases(keywordClusters, creativeAngles, brandStrengths, scrape, observedQueries, seed) {
+  const signalFamilies = detectSignalFamilies(keywordClusters, creativeAngles, scrape, observedQueries);
+  const ideas = [];
+
+  for (const family of signalFamilies) {
+    const familyIdeas = deterministicPick(DYNAMIC_IDEA_POOLS[family] || [], `${seed}|whitespace|${family}`, 2);
+    for (const idea of familyIdeas) {
+      ideas.push({
+        use_case: idea.customer_problem,
+        suggested_angle: idea.marketing_hook,
+        channels: idea.suggested_channels,
+        why_it_is_white_space: `This expands from the brand’s visible ${family} strength into a more specific buying moment.`,
+        why_fund: idea.why_test_this
+      });
+    }
+  }
+
+  const topBrandStrength = brandStrengths[0];
+  if (topBrandStrength) {
+    ideas.push({
+      use_case: `${topBrandStrength.strength} carried into a narrower decision moment`,
+      suggested_angle: `Take the visible strength in ${topBrandStrength.strength.toLowerCase()} and make it more scenario-specific.`,
+      channels: ["google_ads", "meta_ads", "display"],
+      why_it_is_white_space: "Many brands stop at category language instead of moving into the real-life moment behind the search.",
+      why_fund: `The analyzed brand appears strong in ${topBrandStrength.strength.toLowerCase()}, which suggests real audience resonance.`
+    });
+  }
+
+  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "use_case")).slice(0, 10);
+}
+
 function buildCreativeSummary(detectedAngles) {
   const top = detectedAngles.filter((a) => a.detected).slice(0, 3).map((a) => a.angle);
   if (!top.length) return "No strong creative angles were detected from visible on-page messaging.";
@@ -911,7 +1109,7 @@ function buildChannelRecommendations(keywordClusters, detectedAngles) {
     google_ads: [
       `Prioritize clusters such as ${topSearch.map((x) => x.cluster).join(", ") || "reverse phone lookup, privacy protection, people search"}.`,
       "Build tightly segmented ad groups and landing pages by use case, not just by broad category.",
-      "Test privacy-adjacent copy that frames your public-records product as a self-exposure awareness tool."
+      "Use short, specific, low-friction headlines with the problem and payoff in the first line."
     ],
     bing_ads: [
       "Port high-intent Google structures first.",
@@ -920,7 +1118,7 @@ function buildChannelRecommendations(keywordClusters, detectedAngles) {
     meta_ads: [
       `Lead with user-problem angles such as ${topSocial.map((x) => x.angle).join(", ") || "privacy / control my data, safety / protect myself"}.`,
       "Use scenario-led ads rather than feature-led ads.",
-      "Test family-protection and self-audit creative."
+      "Keep hooks concrete and consequence-led."
     ],
     tiktok_ads: [
       "Use short narrative hooks around scam concern, exposed data, unknown caller anxiety, and dating safety.",
@@ -931,57 +1129,6 @@ function buildChannelRecommendations(keywordClusters, detectedAngles) {
       "Use reassurance, trust, and exposed-information proof themes."
     ]
   };
-}
-
-function buildDynamicWhitespaceUseCases(keywordClusters, creativeAngles, brandStrengths) {
-  const ideas = [...BASE_WHITE_SPACE_USE_CASES];
-
-  const strongPrivacy = brandStrengths.some((x) => /privacy/i.test(x.strength));
-  const strongUtility = brandStrengths.some((x) => /utility|people search|reverse phone/i.test(x.strength));
-  const strongProperty = keywordClusters.some((k) => k.cluster === "property records" && k.detected_on_competitor);
-
-  if (strongPrivacy) {
-    ideas.push({
-      use_case: "Personal exposure audit before a move, breakup, or major life reset",
-      suggested_angle: "See what your old public footprint is still revealing.",
-      channels: ["meta_ads", "google_ads", "display"],
-      why_it_is_white_space: "Privacy brands often stay generic instead of mapping to real life transitions.",
-      why_fund: "Life-event framing can make privacy relevance feel urgent and personal."
-    });
-  }
-
-  if (strongUtility) {
-    ideas.push({
-      use_case: "Family logistics and lost-contact recovery for weddings, reunions, funerals, and milestone events",
-      suggested_angle: "Find the people you do not want to leave out.",
-      channels: ["google_ads", "meta_ads", "display"],
-      why_it_is_white_space: "Most direct-response players do not productize reconnection around event planning.",
-      why_fund: "This broadens demand beyond suspicion or fear into practical emotional utility."
-    });
-  }
-
-  if (strongProperty) {
-    ideas.push({
-      use_case: "Private transaction confidence for rural equipment, trailers, animals, and off-market property deals",
-      suggested_angle: "Before you drive, deposit, or commit, know more.",
-      channels: ["google_ads", "meta_ads", "display"],
-      why_it_is_white_space: "This extends trust-check positioning into enthusiast and rural transaction markets.",
-      why_fund: "These buyers are high-intent and heavily motivated by avoiding mistakes."
-    });
-  }
-
-  const topExpansion = keywordClusters.find((k) => k.intent_type === "expansion");
-  if (topExpansion) {
-    ideas.push({
-      use_case: `${titleCase(topExpansion.cluster)} as a broader trust-decision category`,
-      suggested_angle: `Use ${topExpansion.cluster} to solve a bigger real-world decision, not just a lookup task.`,
-      channels: topExpansion.recommended_channels || ["google_ads"],
-      why_it_is_white_space: "Most competitors stop at the feature and do not broaden into the life decision behind the query.",
-      why_fund: "That can produce stronger creative differentiation and higher message relevance."
-    });
-  }
-
-  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "use_case")).slice(0, 10);
 }
 
 function buildTestHypotheses(whitespaceUseCases, creativeAngles) {
@@ -1374,71 +1521,48 @@ function buildPortfolioBenchmark(domain, portfolioCompetitors, keywordClusters, 
   };
 }
 
-function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition, brandStrengths, scrape, observedQueries) {
-  const ideas = [...ANGLE_GENERATOR_LIBRARY];
+function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases, competition, brandStrengths, scrape, observedQueries, seed) {
+  const signalFamilies = detectSignalFamilies(keywordClusters, creativeAngles, scrape, observedQueries);
+  const ideas = [];
 
-  const topKeyword = keywordClusters[0];
-  if (topKeyword) {
-    ideas.push({
-      idea_name: `Own the sharper version of ${topKeyword.cluster}`,
-      marketing_hook: `The smarter way to handle ${topKeyword.cluster}.`,
-      customer_problem: `Users searching for ${topKeyword.cluster} often want a faster, clearer, and more confidence-building answer.`,
-      why_truthfinder_can_help: `Public-record context already has strong relevance for ${topKeyword.cluster} and can support a more concrete problem-solution flow.`,
-      suggested_channels: topKeyword.recommended_channels || ["google_ads"],
-      test_format: "Dedicated campaign + use-case landing page",
-      why_test_this: "This ties directly to a high-opportunity cluster already surfaced by the model."
-    });
+  for (const family of signalFamilies) {
+    const selected = deterministicPick(DYNAMIC_IDEA_POOLS[family] || [], `${seed}|angle|${family}`, 2);
+    for (const idea of selected) {
+      ideas.push({
+        ...idea,
+        direct_response_fit: "High",
+        why_brand_specific: `Selected because the analyzed brand shows visible ${family}-oriented demand or messaging.`
+      });
+    }
   }
 
   const strongestAngle = creativeAngles.find((a) => a.detected);
   if (strongestAngle) {
     ideas.push({
-      idea_name: `${strongestAngle.angle} — sharper scenario expansion`,
+      idea_name: `${strongestAngle.angle} — sharpened bottom-funnel expansion`,
       marketing_hook: strongestAngle.hook_templates[0],
       customer_problem: strongestAngle.user_problem,
-      why_truthfinder_can_help: "The analyzed brand already signals that this motivation resonates, but it can be expanded into narrower real-life scenarios.",
+      why_truthfinder_can_help: "The analyzed brand already signals that this theme resonates, but it can be made more specific to a moment-of-need.",
       suggested_channels: strongestAngle.best_channels || ["google_ads"],
-      test_format: "Ad family split by scenario",
-      why_test_this: "This particular brand appears to do this theme relatively well already."
-    });
-  }
-
-  const privacyAngle = creativeAngles.find((a) => a.angle === "Privacy / control my data");
-  if (privacyAngle) {
-    ideas.push({
-      idea_name: "Public Record Footprint Awareness",
-      marketing_hook: "Know what your public footprint may be saying about you.",
-      customer_problem: "Users may not realize how much public-record context exists around them.",
-      why_truthfinder_can_help: "Public-record data turns vague exposure anxiety into a visible and understandable problem.",
-      suggested_channels: privacyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Awareness-driven landing page + social creative",
-      why_test_this: "This bridges classic people-search utility with privacy positioning."
-    });
-  }
-
-  const safetyAngle = creativeAngles.find((a) => a.angle === "Safety / protect myself");
-  if (safetyAngle) {
-    ideas.push({
-      idea_name: "Trust Before Transaction",
-      marketing_hook: "Before you say yes, know more.",
-      customer_problem: "Consumers make fast trust decisions in dating, marketplaces, home services, and private transactions with limited context.",
-      why_truthfinder_can_help: "Public-record data can act as a general trust-check layer before money, time, or physical safety are on the line.",
-      suggested_channels: safetyAngle.best_channels || ["meta_ads", "google_ads"],
-      test_format: "Cross-use-case landing page + ad set family",
-      why_test_this: "This could become a broad umbrella framing for many use cases outside the standard category."
+      test_format: "Ad family split by scenario and urgency",
+      why_test_this: `This particular brand appears to do ${strongestAngle.angle.toLowerCase()} relatively well already.`,
+      direct_response_fit: "High",
+      why_brand_specific: strongestAngle.reason
     });
   }
 
   const topBrandStrength = brandStrengths[0];
   if (topBrandStrength) {
     ideas.push({
-      idea_name: `${topBrandStrength.strength} → adjacent market expansion`,
-      marketing_hook: `Take "${topBrandStrength.strength}" into a new buying context.`,
-      customer_problem: `The analyzed brand appears strong in ${topBrandStrength.strength.toLowerCase()}, but not necessarily in the adjacent decisions that sit around it.`,
-      why_truthfinder_can_help: "Public-record data can move from a lookup feature into a decision-confidence layer.",
+      idea_name: `${topBrandStrength.strength} into a narrower buying moment`,
+      marketing_hook: `Take "${topBrandStrength.strength}" and make it more specific.`,
+      customer_problem: `The analyzed brand appears strong in ${topBrandStrength.strength.toLowerCase()}, but not necessarily in the decision moments around it.`,
+      why_truthfinder_can_help: "Public-record context can move from a lookup feature into a decision-confidence layer.",
       suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Adjacent-market landing page test",
-      why_test_this: topBrandStrength.why
+      test_format: "Bottom-funnel scenario landing page",
+      why_test_this: topBrandStrength.why,
+      direct_response_fit: "Medium-High",
+      why_brand_specific: `Selected from the brand’s strongest visible theme: ${topBrandStrength.strength}.`
     });
   }
 
@@ -1446,15 +1570,17 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
     ideas.push({
       idea_name: "Privacy-to-Lookup Bridge",
       marketing_hook: "Not just privacy. Know what’s actually out there.",
-      customer_problem: "Privacy-aware users may want more than removal or masking. They may want understanding and context.",
-      why_truthfinder_can_help: "Public-record context can serve as the 'understand first' step before users decide what to remove, protect, or investigate.",
+      customer_problem: "Privacy-aware users may want understanding and context before they act.",
+      why_truthfinder_can_help: "Public-record context can serve as the understand-first step before users decide what to remove, protect, or investigate.",
       suggested_channels: ["google_ads", "meta_ads", "display"],
       test_format: "Bridge-message campaign",
-      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product."
+      why_test_this: "This can help the product compete upstream against privacy brands without pretending to be the same product.",
+      direct_response_fit: "Medium",
+      why_brand_specific: "Chosen because the analyzed brand competes on adjacent privacy/problem framing."
     });
   }
 
-  for (const item of whitespaceUseCases.slice(0, 4)) {
+  for (const item of whitespaceUseCases.slice(0, 3)) {
     ideas.push({
       idea_name: `${item.use_case} Expansion`,
       marketing_hook: item.suggested_angle,
@@ -1462,35 +1588,101 @@ function buildAngleGenerator(keywordClusters, creativeAngles, whitespaceUseCases
       why_truthfinder_can_help: "Public-record context can reduce uncertainty and provide real-world signals before a trust decision is made.",
       suggested_channels: item.channels || ["meta_ads"],
       test_format: "Single-problem campaign test",
-      why_test_this: item.why_fund
+      why_test_this: item.why_fund,
+      direct_response_fit: "Medium-High",
+      why_brand_specific: "Selected from the dynamic whitespace engine built off brand signals."
     });
   }
 
-  if ((observedQueries || []).some((q) => q.includes("property") || q.includes("address"))) {
-    ideas.push({
-      idea_name: "Rural Buyer / Land / Property Confidence Layer",
-      marketing_hook: "Before you drive out, know more.",
-      customer_problem: "Buyers evaluating land, rural property, animals, or equipment often rely on very little verified context.",
-      why_truthfinder_can_help: "Identity and location context can reduce wasted travel and trust mistakes.",
-      suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Rural buyer campaign",
-      why_test_this: "Observed query behavior suggests address or property intent that could widen into higher-value trust decisions."
-    });
-  }
+  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "idea_name")).slice(0, 12);
+}
 
-  if ((scrape.h1 || "").toLowerCase().includes("privacy") || (scrape.meta_description || "").toLowerCase().includes("privacy")) {
-    ideas.push({
-      idea_name: "Post-Breach Self-Check",
-      marketing_hook: "After a leak, know what someone could connect back to you.",
-      customer_problem: "People responding to breaches often feel exposed but unclear on what public context others can piece together.",
-      why_truthfinder_can_help: "The product can make vague post-breach concern more concrete and understandable.",
-      suggested_channels: ["google_ads", "meta_ads", "display"],
-      test_format: "Post-breach response landing page",
-      why_test_this: "The analyzed brand leans privacy, which suggests adjacent breach-anxiety demand may convert."
-    });
-  }
+function buildDirectResponseLanguage(keywordClusters, creativeAngles, brandStrengths, observedQueries) {
+  const topCluster = keywordClusters[0];
+  const topAngle = creativeAngles.find((a) => a.detected) || creativeAngles[0];
+  const topStrength = brandStrengths[0]?.strength || (topCluster?.cluster || "core lookup intent");
+  const queryExample = observedQueries[0] || topCluster?.representative_keywords?.[0] || "people search";
 
-  return filterOutFcraSensitiveIdeas(uniqueObjectsByKey(ideas, "idea_name")).slice(0, 20);
+  const universal_patterns = DIRECT_RESPONSE_PATTERN_BANK.map((p) => ({
+    ...p,
+    industry_translation: "These are evergreen direct-response structures adapted for short-form search ads, social hooks, and landing-page openers."
+  }));
+
+  const search_headlines = [
+    `${titleCase(queryExample)}? Get Answers Fast`,
+    `Before You Trust, Know More`,
+    `Need To Check First? Start Here`,
+    `Get Clarity In Minutes`,
+    `Search Now. Know More Soon.`
+  ];
+
+  const paid_social_hooks = [
+    `If ${queryExample.toLowerCase()} matters right now, make the fast check before you act.`,
+    `The mistake is not always obvious until it is expensive. Check first.`,
+    `One search now can save you a bad decision later.`,
+    `Before the meetup, callback, deposit, or reply, know more.`,
+    `You do not need more content. You need clarity.`
+  ];
+
+  const landing_page_openers = [
+    `You are here because you need clarity on ${queryExample.toLowerCase()}.`,
+    `When the decision matters, the fastest path is a clear check first.`,
+    `The goal is simple: reduce uncertainty before you move forward.`,
+    `If you are trying to figure out ${queryExample.toLowerCase()}, start with the most direct next step.`
+  ];
+
+  const cta_lines = [
+    "Start the search now",
+    "Check first",
+    "Get answers fast",
+    "See what you can find",
+    "Search before you decide"
+  ];
+
+  const brand_specific_swipes = [
+    {
+      swipe_name: `${topStrength} — search ad swipe`,
+      best_use: "Google / Bing bottom-funnel RSA testing",
+      examples: [
+        `${titleCase(topCluster?.cluster || queryExample)}? Get Answers Fast`,
+        `Before You Move Forward, Check First`,
+        `The Fast Way To Get Clarity`,
+        `Search Now. Know More Soon.`
+      ]
+    },
+    {
+      swipe_name: `${topAngle?.angle || "Core angle"} — paid social swipe`,
+      best_use: "Meta / TikTok direct-response hooks",
+      examples: [
+        topAngle?.hook_templates?.[0] || "Before you trust, know more.",
+        topAngle?.hook_templates?.[1] || "One quick check can save you a bigger mistake.",
+        "The fastest way to reduce uncertainty is to check first."
+      ]
+    },
+    {
+      swipe_name: "Cross-industry direct-response copy rules",
+      best_use: "Any performance channel",
+      examples: [
+        "Lead with the problem, not the brand.",
+        "Make the consequence legible in one sentence.",
+        "Use one concrete CTA, not three vague ones.",
+        "Say what happens next and how fast."
+      ]
+    }
+  ];
+
+  return {
+    methodology_note:
+      "These are modeled high-probability direct-response language patterns built from evergreen DR principles: specificity, urgency, consequence, payoff, and low-friction CTA.",
+    universal_patterns,
+    best_in_market_examples: {
+      search_headlines,
+      paid_social_hooks,
+      landing_page_openers,
+      cta_lines
+    },
+    brand_specific_swipes
+  };
 }
 
 async function analyzeSerps(domain, env) {
@@ -1631,6 +1823,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const scrape = await fetchHtml(url);
   const domain = domainFromUrl(scrape.final_url);
   const competitorName = titleCase(domain.replace(".com", "").replace(/-/g, " "));
+  const seed = `${domain}|${scrape.h1}|${scrape.title}|${scrape.meta_description}`;
 
   const fullText = getFullText(scrape).toLowerCase();
   const clusterPresence = getClusterPresence(fullText, scrape);
@@ -1640,7 +1833,14 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
   const detectedAngles = detectCreativeAngles(fullText, scrape);
   const creative_angles = detectedAngles.slice(0, 8);
   const brand_strengths = buildBrandStrengths(scrape, keyword_clusters, creative_angles);
-  const whitespace_use_cases = buildDynamicWhitespaceUseCases(keyword_clusters, creative_angles, brand_strengths);
+  const whitespace_use_cases = buildDynamicWhitespaceUseCases(
+    keyword_clusters,
+    creative_angles,
+    brand_strengths,
+    scrape,
+    observedQueries,
+    seed
+  );
   const scores = scoreModel(clusterPresence, detectedAngles, scrape);
 
   const competition_classification = classifyCompetition(
@@ -1680,6 +1880,14 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     competition_classification,
     brand_strengths,
     scrape,
+    observedQueries,
+    seed
+  );
+
+  const direct_response_language = buildDirectResponseLanguage(
+    keyword_clusters,
+    creative_angles,
+    brand_strengths,
     observedQueries
   );
 
@@ -1730,7 +1938,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     "Use the observed query universe and search term alignment to decide which themes are worth protecting or expanding.",
     "Run at least one steal-their-traffic play in search and one in paid social.",
     "Test 3 to 5 fresh generated hooks from the angle generator, especially adjacent-market and life-event ideas.",
-    "Measure winners at the query, use-case, and landing-page level, not just campaign level."
+    "Use the direct-response language section to upgrade search ads, paid social hooks, and landing-page openers."
   ];
 
   return {
@@ -1752,6 +1960,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
     auction_overlap_estimator,
     search_term_alignment,
     steal_their_traffic_engine,
+    direct_response_language,
 
     keyword_opportunity_score: scores.keyword_opportunity_score,
     paid_intent_coverage_score: scores.paid_intent_coverage_score,
@@ -1794,6 +2003,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
       `Benchmark assumptions: CTR=${assumptions.benchmark_ctr_pct}%, CVR=${assumptions.benchmark_cvr_pct}%, CPC=$${assumptions.benchmark_cpc}, monthly_impr=${assumptions.benchmark_monthly_impressions}`,
       searchTerms.length ? `Search terms supplied: ${searchTerms.length}` : "No search terms supplied.",
       analystQuestions ? `Analyst focus questions: ${analystQuestions}` : "No custom analyst questions supplied.",
+      "Angle generation is dynamically selected from brand signal families rather than static recommendations.",
       "FCRA-sensitive ideas and eligibility-style use cases were filtered out of generated outputs.",
       "No persistent storage is used; each analysis is generated fresh per request."
     ]
@@ -1802,7 +2012,7 @@ async function analyzeCompetitor(inputUrl, env, payload = {}) {
 
 export async function onRequestPost(context) {
   try {
-    console.log("ANALYZE VERSION: dynamic-query-overlap-v2");
+    console.log("ANALYZE VERSION: dynamic-dr-language-v3");
     const payload = await context.request.json();
     const result = await analyzeCompetitor(payload?.url || "", context.env, payload);
 
