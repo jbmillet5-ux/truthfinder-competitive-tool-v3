@@ -30,6 +30,15 @@
       font-family: Arial, sans-serif;
     }
 
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
     .container {
       max-width: 1600px;
       margin: 0 auto;
@@ -319,6 +328,29 @@
       font-size: 11px;
       border-radius: 999px;
     }
+
+    .metaRow {
+      display: grid;
+      grid-template-columns: 260px 1fr auto;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .metaRow {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .metaDomain {
+      font-size: 13px;
+      color: var(--blue);
+      background: #1a273b;
+      border: 1px solid #334a70;
+      border-radius: 10px;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -398,6 +430,35 @@ background check before dating"></textarea>
         <div id="portfolioList" class="portfolioList"></div>
       </div>
 
+      <div class="card" style="margin-top:16px; margin-bottom:0;">
+        <h3 style="margin-bottom:10px;">Meta Ad Library Links</h3>
+        <div class="small">
+          Edit Meta Ad Library links directly here. These are saved locally in your browser for future sessions on this machine.
+        </div>
+
+        <div class="row" style="margin-top:12px; align-items:end;">
+          <div class="grow">
+            <label for="metaLinkDomainInput">Domain</label>
+            <input id="metaLinkDomainInput" type="text" placeholder="e.g. beenverified.com" />
+          </div>
+          <div class="grow">
+            <label for="metaLinkUrlInput">Meta Ad Library URL</label>
+            <input id="metaLinkUrlInput" type="text" placeholder="Paste the full Meta Ad Library URL" />
+          </div>
+          <div class="narrow">
+            <button id="saveMetaLinkBtn" class="secondary">Save Link</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px; align-items:end;">
+          <div class="narrow">
+            <button id="resetMetaLinksBtn" class="secondary">Reset Meta Links</button>
+          </div>
+        </div>
+
+        <div id="metaLinksEditor" style="margin-top:14px;"></div>
+      </div>
+
       <div class="row" style="margin-top:16px;">
         <div class="narrow">
           <label for="benchmarkCtr">Assumed CTR %</label>
@@ -472,6 +533,11 @@ background check before dating"></textarea>
       <div class="card">
         <h2>Portfolio Benchmark Snapshot</h2>
         <div id="portfolioBenchmark"></div>
+      </div>
+
+      <div class="card">
+        <h2>Meta Ad Library Links</h2>
+        <div id="metaAdLibrary"></div>
       </div>
 
       <div class="card">
@@ -575,6 +641,12 @@ background check before dating"></textarea>
       "ussearch.com"
     ];
 
+    const DEFAULT_META_LINKS = {
+      "beenverified.com": "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&is_targeted_country=false&media_type=all&search_type=page&sort_data[direction]=desc&sort_data[mode]=total_impressions&view_all_page_id=506883915831965"
+    };
+
+    const META_STORAGE_KEY = "pcgw_meta_ad_library_links_v1";
+
     let portfolioCompetitors = [...DEFAULT_PORTFOLIO];
 
     const urlInput = document.getElementById("urlInput");
@@ -597,7 +669,14 @@ background check before dating"></textarea>
     const warningEl = document.getElementById("warning");
     const resultsEl = document.getElementById("results");
 
+    const metaLinkDomainInput = document.getElementById("metaLinkDomainInput");
+    const metaLinkUrlInput = document.getElementById("metaLinkUrlInput");
+    const saveMetaLinkBtn = document.getElementById("saveMetaLinkBtn");
+    const resetMetaLinksBtn = document.getElementById("resetMetaLinksBtn");
+    const metaLinksEditor = document.getElementById("metaLinksEditor");
+
     let latestResult = null;
+    let metaAdLinks = loadMetaLinks();
 
     function escapeHtml(str) {
       return String(str || "")
@@ -623,6 +702,21 @@ background check before dating"></textarea>
       return "green";
     }
 
+    function loadMetaLinks() {
+      try {
+        const raw = localStorage.getItem(META_STORAGE_KEY);
+        if (!raw) return { ...DEFAULT_META_LINKS };
+        const parsed = JSON.parse(raw);
+        return { ...DEFAULT_META_LINKS, ...(parsed || {}) };
+      } catch {
+        return { ...DEFAULT_META_LINKS };
+      }
+    }
+
+    function saveMetaLinks() {
+      localStorage.setItem(META_STORAGE_KEY, JSON.stringify(metaAdLinks));
+    }
+
     function renderPortfolioList() {
       portfolioListEl.innerHTML = portfolioCompetitors.map((domain, idx) => `
         <div class="portfolioItem">
@@ -636,6 +730,55 @@ background check before dating"></textarea>
           const idx = Number(btn.getAttribute("data-index"));
           portfolioCompetitors.splice(idx, 1);
           renderPortfolioList();
+          renderMetaLinksEditor();
+        });
+      });
+    }
+
+    function getAllKnownDomains() {
+      const set = new Set([
+        ...DEFAULT_PORTFOLIO,
+        ...portfolioCompetitors,
+        ...Object.keys(metaAdLinks || {})
+      ]);
+      return [...set].filter(Boolean).sort();
+    }
+
+    function renderMetaLinksEditor() {
+      const domains = getAllKnownDomains();
+
+      metaLinksEditor.innerHTML = domains.length ? domains.map((domain) => {
+        const link = metaAdLinks[domain] || "";
+        return `
+          <div class="metaRow">
+            <div class="metaDomain">${escapeHtml(domain)}</div>
+            <input
+              type="text"
+              value="${escapeHtml(link)}"
+              data-meta-domain="${escapeHtml(domain)}"
+              placeholder="Paste Meta Ad Library URL"
+            />
+            <button class="removeBtn smallBtn" data-remove-meta="${escapeHtml(domain)}">Clear</button>
+          </div>
+        `;
+      }).join("") : `<div class="small">No domains available.</div>`;
+
+      metaLinksEditor.querySelectorAll("input[data-meta-domain]").forEach((input) => {
+        input.addEventListener("change", () => {
+          const domain = input.getAttribute("data-meta-domain");
+          const value = input.value.trim();
+          if (value) metaAdLinks[domain] = value;
+          else delete metaAdLinks[domain];
+          saveMetaLinks();
+        });
+      });
+
+      metaLinksEditor.querySelectorAll("button[data-remove-meta]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const domain = btn.getAttribute("data-remove-meta");
+          delete metaAdLinks[domain];
+          saveMetaLinks();
+          renderMetaLinksEditor();
         });
       });
     }
@@ -649,11 +792,48 @@ background check before dating"></textarea>
       }
       newCompetitorInput.value = "";
       renderPortfolioList();
+      renderMetaLinksEditor();
     });
 
     resetPortfolioBtn.addEventListener("click", () => {
       portfolioCompetitors = [...DEFAULT_PORTFOLIO];
       renderPortfolioList();
+      renderMetaLinksEditor();
+    });
+
+    saveMetaLinkBtn.addEventListener("click", () => {
+      const domain = normalizeDomain(metaLinkDomainInput.value);
+      const url = String(metaLinkUrlInput.value || "").trim();
+
+      if (!domain) {
+        errorEl.textContent = "Please enter a domain for the Meta Ad Library link.";
+        return;
+      }
+
+      errorEl.textContent = "";
+
+      if (url) {
+        metaAdLinks[domain] = url;
+      } else {
+        delete metaAdLinks[domain];
+      }
+
+      if (!portfolioCompetitors.includes(domain) && DEFAULT_PORTFOLIO.indexOf(domain) === -1) {
+        portfolioCompetitors.push(domain);
+        portfolioCompetitors.sort();
+        renderPortfolioList();
+      }
+
+      saveMetaLinks();
+      renderMetaLinksEditor();
+      metaLinkDomainInput.value = "";
+      metaLinkUrlInput.value = "";
+    });
+
+    resetMetaLinksBtn.addEventListener("click", () => {
+      metaAdLinks = { ...DEFAULT_META_LINKS };
+      saveMetaLinks();
+      renderMetaLinksEditor();
     });
 
     async function safeJsonFetch(url, options) {
@@ -831,6 +1011,50 @@ background check before dating"></textarea>
           </table>
         ` : `<div class="small" style="margin-top:10px;">No portfolio benchmark rows returned.</div>`}
       `;
+    }
+
+    function renderMetaAdLibrary(data) {
+      const analyzedDomain = String(data.domain || "").toLowerCase();
+      const portfolio = (data.portfolio_benchmark?.portfolio_competitors || portfolioCompetitors || []);
+      const uniqueDomains = [...new Set([analyzedDomain, ...portfolio].filter(Boolean))];
+
+      const rows = uniqueDomains.map((domain) => {
+        const link = metaAdLinks[domain] || "";
+        return {
+          domain,
+          link,
+          isAnalyzed: domain === analyzedDomain
+        };
+      });
+
+      document.getElementById("metaAdLibrary").innerHTML = rows.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Brand</th>
+              <th>Status</th>
+              <th>Meta Ad Library</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td>
+                  <strong>${escapeHtml(r.domain)}</strong>
+                  ${r.isAnalyzed ? `<span class="pill gold" style="margin-left:8px;">Analyzed Brand</span>` : ""}
+                </td>
+                <td>${r.link ? "Linked" : "Missing link"}</td>
+                <td>
+                  ${r.link
+                    ? `<a href="${escapeHtml(r.link)}" target="_blank" rel="noopener noreferrer">Open Meta Ad Library</a>`
+                    : `<span class="small">Add link in Meta Ad Library Links editor above</span>`
+                  }
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      ` : `<div class="small">No brands available for Meta Ad Library links.</div>`;
     }
 
     function renderStealTraffic(data) {
@@ -1161,6 +1385,11 @@ background check before dating"></textarea>
       if (!data.brand_strengths?.length) warnings.push("No brand strengths returned.");
       if (!data.observed_query_universe?.length) warnings.push("No observed query universe returned.");
 
+      const analyzedDomain = String(data.domain || "").toLowerCase();
+      if (analyzedDomain && !metaAdLinks[analyzedDomain]) {
+        warnings.push(`No Meta Ad Library link mapped for analyzed domain: ${analyzedDomain}`);
+      }
+
       if (warnings.length) {
         warningEl.classList.remove("hidden");
         warningEl.innerHTML = `<strong>Missing output coverage:</strong><br>${warnings.map(w => `• ${escapeHtml(w)}`).join("<br>")}`;
@@ -1180,6 +1409,7 @@ background check before dating"></textarea>
       renderSearchTermAlignment(data);
       renderKeywordQueryOverlap(data);
       renderPortfolioBenchmark(data);
+      renderMetaAdLibrary(data);
       renderStealTraffic(data);
       renderScores(data);
       renderOpportunityModel(data);
@@ -1292,6 +1522,7 @@ background check before dating"></textarea>
     });
 
     renderPortfolioList();
+    renderMetaLinksEditor();
   </script>
 </body>
 </html>
